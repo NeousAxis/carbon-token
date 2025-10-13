@@ -1,9 +1,13 @@
 // ==================================================
 // ⚙️ CONFIG (copier-coller prêt à l'emploi)
 // ==================================================
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY;
 const SUPABASE_URL = 'https://drmlsquvwybixocjwdud.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRybWxzcXV2d3liaXhvY2p3ZHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMDU0NzUsImV4cCI6MjA3NTg4MTQ3NX0.rimLZpAQEyVy8ci1j76HbgagFdtQJefKhZFkr20mlrE';
+
+if (!OPENROUTER_KEY) {
+  throw new Error('OPENROUTER_KEY is missing. Please set it in .env');
+}
 
 // Limite de sécurité pour éviter les surcoûts d'IA (mets 999 si tu veux tout traiter)
 const MAX_ITEMS = 20;     // ← ajuste si besoin
