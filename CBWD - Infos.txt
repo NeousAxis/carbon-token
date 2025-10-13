@@ -1,0 +1,75 @@
+CBWD Token — Informations techniques
+
+Environnement et versions
+- Solana CLI: 1.18.20
+- Réseau: Devnet (URL RPC: https://api.devnet.solana.com)
+- SPL Token CLI: 5.4.0
+- Rust/cargo: cargo 1.90.0 (Homebrew)
+
+Clé dédiée au projet
+- Fichier clé (keypair path): /Users/cyrilleger/.config/solana/cbwd.json
+- Adresse publique (pubkey): 2LJspFTWw5VFTZjRNo9Va1VQTEjARAjSuCH7LR6K8AZW
+- Airdrop: 2 SOL reçus (Devnet)
+  Signature: 3V82AbNhVgZWbVuLsGSyJMjemgDdmre7srW7uDzzH3Fa83SJv6XEiHbAuP7xy7N28ScGWfJBPRGS9w3HSCTHwidd
+- Solde actuel: 2 SOL
+
+Mint CBWD (SPL Token)
+- Adresse du mint (MINT): HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+- Décimales: 6
+- Compte associé du trésor (ATA): 2iNtuKTthWRGiDoK4VZYQJ7dC8t4d2DkR1dbLQx5QqFK
+
+Supply de test frappée
+- 6 décimales ⇒ 1 CBWD = 1,000,000 unités
+- 1,000 CBWD ⇒ 1,000 × 1,000,000 = 1,000,000,000 unités
+- Commande exécutée: spl-token mint $MINT 1000000000
+- Signature de mint: NgeZqq9iKSGxLxc7qQ4LgYjDmwNJQA2ZwVnNKHxCdET3pfQ9buczyGTGJSzT4vL5DsbvASk8kzB555Fn1rCNLQM
+
+Vérifications des comptes SPL
+- Supply (spl-token supply MINT): 1,000,000,000 unités
+- Balance trésor (spl-token balance MINT): 1,000,000,000 unités
+
+Tests rapides burn/mint
+- Burn 0.5 CBWD (500000 unités)
+  Signature: 4KqQgJu7qkkXFwZPpF5teFjyuMgEBB6igVeYKu3y66UkQ9MANidFA5wee87UdeZspMqzRhniKwmChk9hodSmyLhe
+  Supply après burn: 999,500,000 unités
+  Balance trésor: 999,500,000 unités
+- Mint 0.5 CBWD (500000 unités)
+  Signature: 2Qmzub9V8YxYEjJdTyHewZ1mCtCgTVZfoWbg61r5p3LfVeSC4u3cGjshvy8W7RQCWf1tKPmHJTvzco2KqDZ5Uxfs
+  Supply après mint: 1,000,000,000 unités
+  Balance trésor: 1,000,000,000 unités
+
+Notes de sécurité
+- La seed phrase de la clé n’est PAS incluse dans ce fichier.
+- Conserve-la en lieu sûr et ne la partage jamais.
+
+
+Environnement et versions
+- Solana CLI: 1.18.20
+- Réseau: Devnet (URL RPC: https://api.devnet.solana.com)
+- SPL Token CLI: 5.4.0
+- Rust/cargo: cargo 1.90.0 (Homebrew)
+
+Clé dédiée au projet
+- Fichier clé (keypair path): /Users/cyrilleger/.config/solana/cbwd.json
+- Adresse publique (pubkey): 2LJspFTWw5VFTZjRNo9Va1VQTEjARAjSuCH7LR6K8AZW
+- Airdrop: 2 SOL reçus (Devnet)
+  Signature: 3V82AbNhVgZWbVuLsGSyJMjemgDdmre7srW7uDzzH3Fa83SJv6XEiHbAuP7xy7N28ScGWfJBPRGS9w3HSCTHwidd
+- Solde actuel: 2 SOL
+
+Mint CBWD (SPL Token)
+- Adresse du mint (MINT): HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+- Décimales: 6
+- Compte associé du trésor (ATA): 2iNtuKTthWRGiDoK4VZYQJ7dC8t4d2DkR1dbLQx5QqFK
+
+Supply de test frappée
+- 6 décimales ⇒ 1 CBWD = 1,000,000 unités
+- 1,000 CBWD ⇒ 1,000 × 1,000,000 = 1,000,000,000 unités
+- Commande exécutée: spl-token mint $MINT 1000000000
+- Signature de mint: NgeZqq9iKSGxLxc7qQ4LgYjDmwNJQA2ZwVnNKHxCdET3pfQ9buczyGTGJSzT4vL5DsbvASk8kzB555Fn1rCNLQM
+
+Vérifications des comptes SPL
+- Résultat: le compte trésor affiche 1,000,000,000 unités pour le mint HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+
+Notes de sécurité
+- La seed phrase de la clé n’est PAS incluse dans ce fichier.
+- Conserve-la en lieu sûr et ne la partage jamais.

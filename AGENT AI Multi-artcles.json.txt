@@ -1,0 +1,180 @@
+// ==================================================
+// ⚙️ CONFIG (copier-coller prêt à l'emploi)
+// ==================================================
+const OPENROUTER_KEY = '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';
+const SUPABASE_URL = 'https://drmlsquvwybixocjwdud.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRybWxzcXV2d3liaXhvY2p3ZHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMDU0NzUsImV4cCI6MjA3NTg4MTQ3NX0.rimLZpAQEyVy8ci1j76HbgagFdtQJefKhZFkr20mlrE';
+
+// Limite de sécurité pour éviter les surcoûts d'IA (mets 999 si tu veux tout traiter)
+const MAX_ITEMS = 20;     // ← ajuste si besoin
+const SLEEP_MS  = 400;    // petite pause entre appels IA pour éviter le throttling
+
+const SYSTEM_PROMPT = `Tu es l'Agent CARBON. Analyse selon 4D.
+Réponds UNIQUEMENT : {"decision":"BURN"|"MINT"|"NEUTRAL","amount_crbn":100000,"final_score":5.5,"confidence":7,"justification":"..."}`;
+
+
+// ==================================================
+// 🧩 PARSE RSS
+// ==================================================
+function parseRSS(xmlString) {
+  const articles = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
+  while ((match = itemRegex.exec(xmlString)) !== null) {
+    const itemXml = match[1];
+    const titleMatch = /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s.exec(itemXml);
+    const title = titleMatch ? (titleMatch[1] || titleMatch[2] || '').trim() : '';
+    const linkMatch = /<link>(.*?)<\/link>/s.exec(itemXml);
+    const link = linkMatch ? linkMatch[1].trim() : '';
+    const descMatch = /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/s.exec(itemXml);
+    const description = descMatch ? (descMatch[1] || descMatch[2] || '').trim() : '';
+    if (title && link) articles.push({ title, link, description });
+  }
+  return articles;
+}
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+
+// ==================================================
+// 🚀 MAIN
+// ==================================================
+const http = this.helpers.httpRequest;
+const allInputs = $input.all();
+let allArticles = [];
+
+// 1) Collecter tous les articles de tous les inputs
+for (const inputData of allInputs) {
+  const rssXml = typeof inputData.json?.data === 'string'
+    ? inputData.json.data
+    : (typeof inputData.json === 'string' ? inputData.json : '');
+  if (!rssXml) continue;
+
+  const articles = parseRSS(rssXml);
+  const source = rssXml.includes('name=green') ? 'Euronews Green' : 'Euronews';
+  for (const a of articles) allArticles.push({ ...a, source });
+}
+
+// 2) Dédupliquer par URL (au cas où deux flux contiennent le même lien)
+const seen = new Set();
+allArticles = allArticles.filter(a => {
+  if (seen.has(a.link)) return false;
+  seen.add(a.link);
+  return true;
+});
+
+// 3) Limiter si besoin
+if (allArticles.length > MAX_ITEMS) {
+  allArticles = allArticles.slice(0, MAX_ITEMS);
+}
+
+if (allArticles.length === 0) {
+  return [{ json: { info: 'No articles found' } }];
+}
+
+console.log(`🧪 ${allArticles.length} article(s) à traiter`);
+
+// 4) Traiter chaque article
+const results = [];
+
+for (const { title, link, description, source } of allArticles) {
+  try {
+    // --- Check existence Supabase ---
+    const existing = await http.call(this, {
+      method: 'GET',
+      url: `${SUPABASE_URL}/rest/v1/carbon_events`,
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Accept: 'application/json',
+      },
+      qs: { event_url: `eq.${link}`, select: 'id' },
+      json: true,
+    });
+
+    if (Array.isArray(existing) && existing.length > 0) {
+      results.push({ json: { skipped: true, reason: 'already processed', url: link, title } });
+      continue;
+    }
+
+    // --- Appel IA ---
+    const aiData = await http.call(this, {
+      method: 'POST',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
+      headers: {
+        Authorization: `Bearer ${OPENROUTER_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: {
+        model: 'openai/gpt-3.5-turbo',
+        temperature: 0.3,
+        max_tokens: 2000,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: `Titre: ${title}\nURL: ${link}\nSource: ${source}\nDescription: ${description}\n\nAnalyse.` }
+        ],
+      },
+      json: true,
+    });
+
+    const aiText = aiData?.choices?.[0]?.message?.content ?? '';
+    const cleaned = aiText.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+
+    let analysis;
+    try {
+      analysis = JSON.parse(cleaned);
+    } catch (e) {
+      results.push({ json: { error: 'AI JSON parse failed', url: link, title, raw: aiText } });
+      // petite pause quand même avant de passer au suivant
+      await sleep(SLEEP_MS);
+      continue;
+    }
+
+    if (!analysis?.decision) {
+      results.push({ json: { error: 'AI decision missing', url: link, title, raw: cleaned } });
+      await sleep(SLEEP_MS);
+      continue;
+    }
+
+    // --- Sauvegarde Supabase ---
+    const txHash = `${analysis.decision}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const eventData = {
+      event_title: title,
+      event_url: link,
+      event_source: source,
+      decision: analysis.decision,
+      amount_crbn: parseInt(analysis.amount_crbn) || 0,
+      final_score: parseFloat(analysis.final_score) || 0,
+      confidence: parseInt(analysis.confidence) || 5,
+      justification: analysis.justification || '',
+      tx_hash: txHash,
+      created_at: new Date().toISOString(),
+    };
+
+    const saved = await http.call(this, {
+      method: 'POST',
+      url: `${SUPABASE_URL}/rest/v1/carbon_events`,
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      },
+      body: eventData,
+      json: true,
+    });
+
+    results.push({ json: { success: true, url: link, title, data: saved } });
+
+    // Pause anti-throttle
+    await sleep(SLEEP_MS);
+
+  } catch (e) {
+    results.push({ json: { error: e.message, url: link, title } });
+    // on continue avec l'article suivant
+    await sleep(SLEEP_MS);
+  }
+}
+
+// 5) Retourner un item par article
+return results;

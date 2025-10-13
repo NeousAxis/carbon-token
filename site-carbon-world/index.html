@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carbon World Dashboard</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; background: #0E1116; color: #EDEFF3; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 32px; margin-bottom: 8px; }
+    .card { background: #151A21; border: 1px solid #232B36; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #232B36; padding: 10px; text-align: left; }
+    th { color: #9CB2CF; font-weight: 600; }
+    a { color: #4FB3F6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: #9CB2CF; font-size: 14px; }
+    /* Ajouts UI */
+    .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .price-card { background: #10141B; border: 1px solid #232B36; border-radius: 12px; padding: 14px; }
+    .price-title { display: flex; align-items: center; justify-content: space-between; font-weight: 600; color: #9CB2CF; margin-bottom: 8px; }
+    .price-value { font-size: 22px; font-weight: 700; }
+    .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; }
+    .badge.up { background: #15341F; color: #55D187; border: 1px solid #1E5631; }
+    .badge.down { background: #3B2121; color: #FF8A8A; border: 1px solid #6B2C2C; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .stat { background: #10141B; border: 1px solid #232B36; border-radius: 12px; padding: 14px; }
+    .stat-label { color: #9CB2CF; font-size: 13px; margin-bottom: 6px; }
+    .stat-value { font-size: 22px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Carbon World Dashboard</h1>
+    <p class="muted">Visualisation des données on-chain et IA (Devnet)</p>
+
+    <div class="card">
+      <h2>Prix</h2>
+      <div id="price-content" class="price-grid">
+        <!-- CBWD & SOL prices -->
+        <div class="price-card"><div class="price-title">CBWD <span class="badge">…</span></div><div class="price-value">Chargement…</div></div>
+        <div class="price-card"><div class="price-title">SOL <span class="badge">…</span></div><div class="price-value">Chargement…</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Statistiques</h2>
+      <div id="stats-content" class="stats-grid">Chargement…</div>
+    </div>
+
+    <div class="card">
+      <h2>Derniers événements</h2>
+      <table id="events-table">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Date</th>
+            <th>Décision</th>
+            <th>Montant (CBWD)</th>
+            <th>Source</th>
+            <th>Tx</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="./main.js"></script>
+</body>
+</html>

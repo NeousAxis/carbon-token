@@ -1,0 +1,137 @@
+# CARBON - Livre Blanc
+
+Le Token qui Mesure la Réalité Climatique
+
+## 1. Le Concept
+CARBON (CRBN) est un token Solana piloté par une IA qui mesure les actions climatiques mondiales :
+- ✅ Action positive → Tokens brûlés (supply ↓, valeur ↑)
+- ❌ Action négative → Tokens créés (supply ↑, valeur ↓)
+
+Le paradoxe révolutionnaire : Impossible de s'enrichir en pariant contre la planète. Si l'humanité échoue, le supply explose et la valeur s'effondre.
+
+Supply résiduel : On n'atteindra jamais zéro (activité humaine incompressible = ~20% supply plancher).
+
+## 2. L'Agent IA 4D
+### Les 4 Dimensions d'Analyse
+1. SNAPSHOT (25%) - Impact aujourd'hui avec technologies actuelles
+2. TRAJECTOIRE (20%) - Direction du mouvement (amélioration ou régression ?)
+3. RÉÉVALUATION (15%) - Suivi tous les 2 ans + triggers pour corrections
+4. PROSPECTIVE (40%) - Simulation de 3 futurs possibles sur 2-30 ans
+
+### Exemple Concret
+Événement : "France interdit vols intérieurs courts"
+
+1. Présent : +6/10 (réduction CO2 directe)
+2. Trajectoire : +8/10 (signal fort transport propre)
+3. Suivi : Triggers activés (respect application)
+4. Prospective :
+   - Scénario A (70%) : Succès, modèle copié → +8/10
+   - Scénario B (25%) : Exceptions accumulent → +3/10
+   - Scénario C (5%) : Abandon politique → -2/10
+
+Score futur : +6.25/10
+
+DÉCISION : BURN 315,000 CRBN
+
+### Humilité du Système
+CARBON peut se tromper car il reflète nos erreurs collectives. Chaque évaluation inclut :
+- Score de confiance (1-10)
+- Clause de faillibilité inscrite on-chain
+- Corrections publiques si erreur détectée
+- Sources et hypothèses transparentes
+
+## 3. TOKENOMICS
+### Supply et Distribution
+Supply Initial : 1,000,000,000 CRBN
+
+### Mécanisme Burn/Mint
+Échelle d'Impact :
+- Local (ville) : 1K-10K CRBN
+- Régional : 10K-100K CRBN
+- National : 100K-1M CRBN
+- International : 1M-10M CRBN
+
+Modulation contextuelle : Même action = impact différent selon pays (pop, PIB, émissions actuelles)
+
+### Revenus Fondateur
+1. Vesting Tokens (100M CRBN)
+   - Année 1-4 : 25M CRBN/an débloqués
+   - Valeur potentielle :
+     - Bear ($0.01) : $250K/an → $1M total
+     - Base ($0.10) : $2.5M/an → $10M total
+     - Bull ($1.00) : $25M/an → $100M total
+
+2. Frais Transaction (Optionnel)
+   - 0.05% sur swaps DEX → wallet fondateur
+   - Volume $1M/jour → ~$18K/an
+   - Volume $10M/jour → ~$180K/an
+
+3. Consulting/Partenariats
+   - Gouvernements adoptant CARBON : $50K-200K/contrat
+   - Conférences/représentation : $5K-50K/event
+   - Estimé : $100K-500K/an (an 2+)
+
+Total Projeté 4 ans (scénario base) : $10M-15M
+
+## 4. Lancement Solo - Budget Zéro
+### Phase 1 : Développement (3-6 mois)
+Compétences nécessaires :
+- Solana/Rust (TRAE code : 30 CHF/mois)
+- Prompting IA (API OpenRouter : GRATUIT)
+- Montage vidéo basique (gratuit : CapCut, DaVinci)
+
+Coûts incompressibles :
+- Domaine + site : 15 CHF/an (Infomaniak)
+- Liquidité DEX initiale : $2K-5K minimum (SOL + CRBN)
+- Total minimum : 675 CHF (sur 6 mois)
+
+### Phase 2 : Bootstrapping
+- Mois 1-6 :
+  - Vous validez manuellement les événements (IA assiste)
+  - ~50-100 événements suivis
+  - Transparence totale sur le process
+- Mois 6-12 :
+  - Semi-automatisation progressive
+  - Premiers "validateurs communauté" bénévoles
+  - ~500 événements
+- An 2+ :
+  - Automatisation complète si adoption décolle
+  - Revenus suffisants pour infrastructure robuste
+
+## 5. Roadmap Ultra-Simple
+- Q4 2025 - Q1 2026 : Dev smart contract + Agent IA MVP
+- Q2 2026 : Launch Mainnet + vidéo YouTube 1
+- Q3-Q4 2026 : Croissance organique, premiers burns/mints
+- 2027 : 1,000+ holders, partenariats ONG, semi-automatisation
+- 2028+ : Scale mondial, reconnaissance institutionnelle
+
+## 6. Risques
+- Technique : Bugs smart contract → Audits communautaires + bug bounty
+- Adoption : Personne n'utilise → Persistance 12+ mois nécessaire
+- Régulation : SEC/AMF → Utility token, pas sécurité. Geo-blocking si besoin
+- IA : Erreurs d'évaluation → Corrections publiques, réévaluations
+- Concurrence : Copieurs → First mover + authenticité = avantage
+
+## 7. Pourquoi Ça Peut Marcher
+- ✅ Timing parfait : COP30, urgence climatique max
+- ✅ Narrative puissant : "Premier token qui disparaît = victoire"
+- ✅ Viral potential : Story + YouTube = croissance organique
+- ✅ Alignement parfait : Impossible de profiter du désastre
+- ✅ Solo faisable : Pas besoin d'équipe/millions au départ
+- ✅ Authentique : Vous = Satoshi du climat, passion visible
+
+## Conclusion : Le Pari
+CARBON parie sur l'intelligence collective de l'humanité.
+
+Si nous réussissons → Supply brûle, holders gagnent, monde sauvé.
+
+Si nous échouons → Supply explose, tokens sans valeur, monde détruit.
+
+Pour la première fois, cupidité = altruisme forcé.
+
+---
+Contact : [carbon-token.] | [@CarbonCRBN] | [discord.gg/carbon]
+
+Fondateur : NEOUS AXIS
+
+Version : 1.0 - Octobre 2025

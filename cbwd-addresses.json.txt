@@ -1,0 +1,10 @@
+cat > ~/CARBON-TOKEN/cbwd-addresses.json <<'JSON'
+{
+  "network": "devnet",
+  "mint": "HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs",
+  "treasury_ata": "2iNtuKTthWRGiDoK4VZYQJ7dC8t4d2DkR1dbLQx5QqFK",
+  "decimals": 6,
+  "symbol": "CBWD",
+  "name": "Carbon World"
+}
+JSON
