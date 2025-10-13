@@ -1,0 +1,9 @@
+# Node
+node_modules/
+
+# Env secrets
+.env
+sync/.env
+
+# macOS
+.DS_Store
