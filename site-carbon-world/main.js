@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://drmlsquvwybixocjwdud.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRybWxzcXV2d3liaXhvY2p3ZHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMDU0NzUsImV4cCI6MjA3NTg4MTQ3NX0.rimLZpAQEyVy8ci1j76HbgagFdtQJefKhZFkr20mlrE";
 const CBWD_MINT = "HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs"; // Devnet mint
+const SERVER_URL = "http://localhost:3333"; // serveur mint/burn
 
 // utilitaires format
 const nf = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -111,3 +112,50 @@ async function loadPrices() {
 loadSupply();
 loadEvents();
 loadPrices();
+
+// 4️⃣ statut auto & exécution
+async function loadAuto() {
+  const mEl = document.getElementById('auto-mints');
+  const bEl = document.getElementById('auto-burns');
+  const tEl = document.getElementById('auto-treasury');
+  const sEl = document.getElementById('auto-status');
+  const lastEl = document.getElementById('auto-last');
+  try {
+    const [summaryRes, statusRes] = await Promise.all([
+      fetch(`${SERVER_URL}/pending-summary`),
+      fetch(`${SERVER_URL}/auto/status`),
+    ]);
+    const summary = await summaryRes.json();
+    const status = await statusRes.json();
+    if (!summary.ok) throw new Error('summary_failed');
+    const mintsCount = summary.pending?.mints?.count ?? 0;
+    const mintsSum = summary.pending?.mints?.sum ?? 0;
+    const burnsCount = summary.pending?.burns?.count ?? 0;
+    const burnsSum = summary.pending?.burns?.sum ?? 0;
+    const treasuryUi = summary.treasury_balance?.ui_amount ?? null;
+    mEl.textContent = `${nfi.format(mintsCount)} / ${nf.format(mintsSum/1e6)} CBWD`;
+    bEl.textContent = `${nfi.format(burnsCount)} / ${nf.format(burnsSum/1e6)} CBWD`;
+    tEl.textContent = treasuryUi!=null ? `${nf.format(treasuryUi)} CBWD` : '—';
+    sEl.textContent = status.ok ? (status.enabled ? 'Activé' : 'Désactivé') + (status.running ? ' (en cours)' : '') : '—';
+    lastEl.textContent = `Dernier run: ${status.lastRunAt ? new Date(status.lastRunAt).toLocaleString() : '—'}`;
+  } catch (e) {
+    sEl.textContent = 'Indispo';
+  }
+}
+
+async function runAuto() {
+  const sEl = document.getElementById('auto-status');
+  sEl.textContent = 'Déclenché…';
+  try {
+    const res = await fetch(`${SERVER_URL}/auto/run`, { method: 'POST' });
+    const data = await res.json();
+    sEl.textContent = data.ok ? 'Terminé' : 'Erreur';
+  } catch (e) {
+    sEl.textContent = 'Erreur';
+  }
+  await loadAuto();
+}
+
+document.getElementById('btn-run-auto')?.addEventListener('click', runAuto);
+document.getElementById('btn-refresh-auto')?.addEventListener('click', loadAuto);
+loadAuto();

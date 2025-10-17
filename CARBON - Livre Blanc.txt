@@ -114,3 +114,54 @@ Pour la première fois, cupidité = altruisme forcé.
 
 Contact : [carbon-token.] | [@CarbonCRBN] | [discord.gg/carbon]
 Fondateur : NEOUS AXIS Version : 1.0 - Octobre 2025
+Soutenance Opérationnelle et Financement Interne
+
+Objectif: assurer la pérennité du protocole (frais réseau, salaires, tampon de burn) sans dépendre d’une marketplace maison ni d’extensions spécifiques (ex. Token‑2022).
+
+Pilier 1 — Mint‑Split à l’émission
+- À chaque émission (MINT), répartir le montant entre quatre poches:
+- Utilisateur (user_share) → crédité sur son ATA (CBWD).
+- Tampon de burn (burn_buffer_share) → crédité sur `TREASURY_TOKEN_ACCOUNT` pour absorber les futurs BURN (bonnes nouvelles).
+- Opérations (ops_share) → CBWD en trésorerie, converti périodiquement en SOL pour couvrir les frais réseau.
+- Salaires (payroll_share) → CBWD dédiés aux salaires, convertis en USDC/SOL pour la paie.
+- Paramétrage en basis points (bps):
+- `user = amount × (1 − y_bps − p_bps − b_bps)`
+- `burn_buffer = amount × b_bps`
+- `ops = amount × y_bps`
+- `payroll = amount × p_bps`
+- Exemple initial: `y=25 bps` (0,25%), `p=100 bps` (1,00%), `b=25 bps` (0,25%) → 1,50% de l’émission finance ops+salaires+tampon.
+
+Pilier 2 — Protocol‑Owned Liquidity (POL)
+- Déposer une fraction contrôlée de la trésorerie (CBWD + USDC/SOL) en LP sur Raydium/Orca.
+- Le protocole perçoit des frais de swap sur l’activité DEX, sans imposer de frais côté utilisateur.
+- Stratégie: paire CBWD/USDC pour limiter l’impermanent loss; taille de position graduelle; récolte périodique des fees en USDC/SOL.
+
+Pilier 3 — Politique de tirage et de lissage
+- Définir des caps/jours de BURN basés sur le solde du tampon de burn.
+- Utiliser une file d’attente “pending”: si un BURN ne peut pas être exécuté (insufficient funds), il reste en attente et sera repris automatiquement dès que la trésorerie se recharge.
+- Conversion régulière CBWD→SOL (partie ops) pour alimenter le “Network Pool” (payer des frais réseau) via Jupiter.
+- Règle de draw‑down prudente: protéger un seuil minimal du tampon (ex. 20% du 1/3 initial) et lisser les sorties si besoin.
+
+Fallback Token‑2022 (Optionnel)
+- Si l’écosystème supporte largement SPL Token‑2022 Transfer Fee:
+- Appliquer un y% on‑chain sur chaque transfert (withheld), puis retirer périodiquement vers la trésorerie.
+- Convertir une fraction en SOL pour le Network Pool.
+- Si un jour Token‑2022 n’est plus supporté, les piliers 1–3 suffisent: la soutenabilité ne dépend pas d’un prélèvement on‑chain.
+
+Gouvernance & Paramètres Dynamiques
+- Ajuster `y_bps` si le solde SOL du payer est bas; ajuster `b_bps` si le tampon CBWD diminue; ajuster `p_bps` selon besoins de paie.
+- Exposer des métriques: `treasury_cbwd_balance`, `network_pool_sol_balance`, `pending_burns`, ratios de couverture (burn et frais réseau).
+- Mettre des alertes et un cron de reprise (`/process-pending`) pour garantir une continuité de service.
+
+Intégration Serveur (implémentée)
+- Endpoint `POST /mint-split` avec bps configurables:
+- Inputs: `recipient_token_account`, `amount_crbn` (unités de base).
+- Répartit automatique: utilisateur, trésorerie (tampon burn), ops, payroll.
+- DRY_RUN supporté; signatures réelles si secrets configurés.
+- Mise à jour automatique de la supply et de l’overview à partir de la chaîne (Supabase).
+- File d’attente et reprise: `POST /process-pending` traite les MINT/BURN en attente (tx_hash NULL) par lot.
+
+Résumé de Soutenabilité
+- Les coûts réseau et salaires sont financés à la source (mint‑split) et par POL; aucun frais imposé aux utilisateurs en SOL.
+- Le tampon burn garantit l’alignement “bonnes nouvelles → BURN” et “mauvaises nouvelles → MINT”, avec lissage si nécessaire.
+- La file d’attente empêche toute rupture du service: les événements non signés sont repris dès que les conditions sont réunies.

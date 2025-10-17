@@ -1,0 +1,8 @@
+{
+  "network": "devnet",
+  "mint": "5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC",
+  "treasury_ata": "J3uAiWJJkmeQgDgPwGBBrv5mQTF9Rqjard8VBBFZ5B6a",
+  "decimals": 6,
+  "symbol": "CBWD",
+  "name": "Carbon World"
+}

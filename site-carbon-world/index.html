@@ -49,6 +49,21 @@
     </div>
 
     <div class="card">
+      <h2>Automatisation</h2>
+      <div id="auto-content" class="stats-grid">
+        <div class="stat"><div class="stat-label">MINTs en attente</div><div class="stat-value" id="auto-mints">—</div></div>
+        <div class="stat"><div class="stat-label">BURNs en attente</div><div class="stat-value" id="auto-burns">—</div></div>
+        <div class="stat"><div class="stat-label">Trésorerie (CBWD)</div><div class="stat-value" id="auto-treasury">—</div></div>
+        <div class="stat"><div class="stat-label">Statut</div><div class="stat-value" id="auto-status">—</div></div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <button id="btn-run-auto" style="background:#1E5631; color:#EDEFF3; border:1px solid #2E7A47; padding:8px 12px; border-radius:8px; cursor:pointer;">Exécuter maintenant</button>
+        <button id="btn-refresh-auto" style="background:#232B36; color:#EDEFF3; border:1px solid #2F3A48; padding:8px 12px; border-radius:8px; cursor:pointer;">Rafraîchir</button>
+      </div>
+      <p class="muted" id="auto-last">Dernier run: —</p>
+    </div>
+
+    <div class="card">
       <h2>Derniers événements</h2>
       <table id="events-table">
         <thead>
