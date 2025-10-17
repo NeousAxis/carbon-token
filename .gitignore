@@ -7,3 +7,5 @@ sync/.env
 
 # macOS
 .DS_Store
+# Do not track n8n code node
+CODE ALL IN ONE.txt
