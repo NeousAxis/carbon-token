@@ -1,167 +1,154 @@
-CARBON - Livre Blanc
-Le Token qui Mesure la Réalité Climatique
+🌍 LIVRE BLANC — CBWD (Carbon World Data)
+Protocole autonome d’évaluation des choix mondiaux au travers d’un token utile
+Version Mainnet — Octobre 2025 Auteur : Neous Axis
 
-1. Le Concept
-CARBON (CRBN) est un token Solana piloté par une IA qui mesure les actions climatiques mondiales :
-✅ Action positive → Tokens brûlés (supply ↓, valeur ↑)
-❌ Action négative → Tokens créés (supply ↑, valeur ↓)
-Le paradoxe révolutionnaire : Impossible de s'enrichir en pariant contre la planète. Si l'humanité échoue, le supply explose et la valeur s'effondre.
-Supply résiduel : On n'atteindra jamais zéro (activité humaine incompressible = ~20% supply plancher).
+Identité & Paramètres Réseau
+Nom : Carbon World Data
+Symbole : CBWD
+Réseau : Solana Mainnet-Beta
+Décimales : 6 (1 CBWD = 10⁶ unités de base)
+Publication des adresses : les adresses Mainnet (mint, trésorerie, distribution) seront publiées au TGE sur carbon-token.xyz et sur l’explorateur Solana. Ne pas se fier aux adresses de prototypage.
+Principe : supply variable (mint/burn) en fonction des décisions publiques évaluées par l’Oracle IA 4D.
+Carbon World Data (CBWD) est un token Solana Mainnet-Beta dont la supply varie selon un oracle IA 4D. Le système ne permet pas de s’enrichir contre le monde : actions cohérentes → tokens brûlés (supply ↓, valeur ↑) ; actions incohérentes → tokens créés (supply ↑, valeur ↓).
 
-2. L'Agent IA 4D
-Les 4 Dimensions d'Analyse
-[1] SNAPSHOT (25%) - Impact aujourd'hui avec technologies actuelles
-[2] TRAJECTOIRE (20%) - Direction du mouvement (amélioration ou régression ?)
-[3] RÉÉVALUATION (15%) - Suivi tous les 2 ans + triggers pour corrections
-[4] PROSPECTIVE (40%) - Simulation de 3 futurs possibles sur 2-30 ans
-Exemple Concret
+1. Concept
+CBWD (Carbon World Data) est un Protocole autonome d’évaluation des choix mondiaux au travers d’un token utile. Il agrège des informations politiques, économiques, sociales et environnementales, puis les analyse via une IA 4D. Chaque événement reconnu et validé entraîne automatiquement une variation de supply sur Solana, traduisant l’état de cohérence du monde en données dynamiques.
+Les référentiels utilisés sont :
+les Objectifs de Développement Durable (ODD),
+la Charte universelle des Droits de l’Homme (ONU 1948),
+la Charte universelle des Droits de la Nature (ONU 2010).
+2.x Règle de décision et d’amplitude (Mint/Burn)
+(alignée sur l’implémentation Mainnet actuelle)
+Chaque événement est évalué en snapshot selon son statut, son orientation, et son alignement instantané avec les ODD (ONU), la Charte des Droits de l’Homme et la Charte des Droits de la Nature. Aucune mémoire ni projection : seule la situation présente compte.
 
+1. Décision
+Statuts non implémentés (planned, future, conditional, appeal, alert) → NEUTRAL (aucune action).
+Statuts implémentés / en vigueur (implemented, done, in-force, operational) :
+Orientation positive → BURN
+Orientation négative → MINT
+Orientation neutre → on conserve une décision valide si déjà présente, sinon NEUTRAL
+Règle simple : un événement aligné avec les ODD et les Chartes brûle des tokens ; un événement contraire en crée.
 
-Événement : "France interdit vols intérieurs courts"
+2. Quantification
+L’amplitude de la variation dépend de trois paramètres actifs et d’un champ enregistré mais non appliqué :
 
-[1] Présent : +6/10 (réduction CO2 directe)
-[2] Trajectoire : +8/10 (signal fort transport propre)
-[3] Suivi : Triggers activés (respect application)
-[4] Prospective : 
-    • Scénario A (70%): Succès, modèle copié → +8/10
-    • Scénario B (25%): Exceptions accumulent → +3/10  
-    • Scénario C (5%): Abandon politique → -2/10
-    Score futur : +6.25/10
+La conversion finale s’effectue en unités de base (× 10⁶). Le signe (BURN / MINT) dépend uniquement de l’orientation ; l’amplitude reste indépendante du sens.
 
-DÉCISION : BURN 315,000 CRBN
-Humilité du Système
-CARBON peut se tromper car il reflète nos erreurs collectives. Chaque évaluation inclut :
-Score de confiance (1-10)
-Clause de faillibilité inscrite on-chain
-Corrections publiques si erreur détectée
-Sources et hypothèses transparentes
+3. Portée ODD
+L’oracle publie pour chaque événement la liste des ODD concernés (sdgs) et, lorsque disponible, un ODD principal (sdg_primary). Les classifications « 5 P » (People, Planet, Prosperity, Peace, Partnerships) et les pondérations par ODD sont prévues pour des versions futures et ne sont pas encore exploitées dans le calcul.
 
-3. TOKENOMICS
-Supply et Distribution
-Supply Initial : 1,000,000,000 CRBN
+Exemple 1 — Interdiction nationale des sacs plastiques à usage unique
+Statut : implemented
+Orientation : positive
+ODD concernés : 12 (Consommation et production responsables), 14 (Vie aquatique), 15 (Vie terrestre)
+Échelle : national
+Score : 7/10
+Contexte : 1.0
+Analyse : L’événement favorise directement la réduction de la pollution plastique et la protection des écosystèmes. Amplitude ≈ 100 k + 0.7 × (900 k) = 730 000 CBWD → BURN de 730 000 CBWD → réduction visible de la supply sur l’explorateur.
 
-Mécanisme Burn/Mint
-Échelle d'Impact :
-Local (ville) : 1K-10K CRBN
-Régional : 10K-100K CRBN
-National : 100K-1M CRBN
-International : 1M-10M CRBN
-Modulation contextuelle : Même action = impact différent selon pays (pop, PIB, émissions actuelles)
-Revenus Fondateur
-1. Vesting Tokens (100M CRBN)
-Année 1-4 : 25M CRBN/an débloqués
-Valeur potentielle :
-- Bear ($0.01) : $250K/an → $1M total
-- Base ($0.10) : $2.5M/an → $10M total
-- Bull ($1.00) : $25M/an → $100M total
+Exemple 2 — Suspension d’un traité international sur la protection de l’Arctique
+Statut : in-force (abrogation effective)
+Orientation : négative
+ODD concernés : 13 (Action climatique), 14 (Vie aquatique), 17 (Partenariats pour les objectifs)
+Échelle : international
+Score : 8/10
+Contexte : 1.2 (zone d’impact mondiale)
+Analyse : La suppression d’un mécanisme de coopération environnementale entraîne une dégradation directe de la cohérence mondiale. Amplitude ≈ 1 M + 0.8 × (9 M) = 8.2 M × 1.2 = 9 840 000 CBWD → MINT de 9,84 M CBWD → augmentation mesurable de la supply (signal de dissonance planétaire).
 
+Exemple 3 — Réforme nationale augmentant les quotas d’émission industrielle
+Statut : implemented
+Orientation : négative
+ODD concernés : 7 (Énergie propre et d’un coût abordable), 13 (Action climatique)
+Échelle : national
+Score : 5/10
+Contexte : 1.1
+Analyse : L’augmentation autorisée des émissions de CO₂ va à l’encontre des objectifs climatiques. Amplitude ≈ 100 k + 0.5 × (900 k) = 550 k × 1.1 = 605 000 CBWD → MINT de 605 000 CBWD → légère expansion de la supply reflétant une perte de cohérence nationale.
 
-2. Frais Transaction (Optionnel)
-0.05% sur swaps DEX → wallet fondateur
-Volume $1M/jour → ~$18K/an
-Volume $10M/jour → ~$180K/an
-
-3. Consulting/Partenariats
-Gouvernements adoptant CARBON : $50K-200K/contrat
-Conférences/représentation : $5K-50K/event
-Estimé : $100K-500K/an (an 2+)
-
-Total Projeté 4 ans (scénario base) : $10M-15M
-
-4. Lancement Solo - Budget Zéro
-Phase 1 : Développement (3-6 mois)
-Compétences nécessaires :
-Solana/Rust (TRAE code : 30 CHF/mois)
-Prompting IA (API OpenRouter : GRATUIT)
-Montage vidéo basique (gratuit : CapCut, DaVinci)
-Coûts incompressibles :
-Domaine + site : 15 CHF/an (Infomaniak)
-Liquidité DEX initiale : $2K-5K minimum (SOL + CRBN)
-Total minimum : 675 CHF (sur 6 mois)
-Phase 2 : Bootstrapping
-Mois 1-6 :
-Vous validez manuellement les événements (IA assiste)
-~50-100 événements suivis
-Transparence totale sur le process
-Mois 6-12 :
-Semi-automatisation progressive
-Premiers "validateurs communauté" bénévoles
-~500 événements
-An 2+ :
-Automatisation complète si adoption décolle
-Revenus suffisants pour infrastructure robuste
+Synthèse
 
 
-5. Roadmap Ultra-Simple
-Q4 2025 - Q1 2026 : Dev smart contract + Agent IA MVP Q2 2026 : Launch Mainnet + vidéo YouTube 1 Q3-Q4 2026 : Croissance organique, premiers burns/mints 2027 : 1,000+ holders, partenariats ONG, semi-automatisation 2028+ : Scale mondial, reconnaissance institutionnelle
+5. Évolutivité (prévu)
+Facteur de confiance : son intégration dans le calcul est planifiée pour pondérer la volatilité des décisions.
+Scope ODD 5P : ajout futur d’une classification thématique et de pondérations par ODD.
+Ces extensions n’affecteront pas la règle de décision (orientation → BURN / MINT), uniquement la finesse du calcul d’amplitude.
 
-6. Risques
-Technique : Bugs smart contract → Audits communautaires + bug bounty Adoption : Personne n'utilise → Persistance 12+ mois nécessaire Régulation : SEC/AMF → Utility token, pas sécurité. Geo-blocking si besoin IA : Erreurs d'évaluation → Corrections publiques, réévaluations Concurrence : Copieurs → First mover + authenticité = avantage
+3. Référentiels universels
+CBWD repose sur trois fondements reconnus internationalement :
+Charte universelle des Droits de l’Homme (ONU, 1948)
+Charte universelle des Droits de la Nature (ONU, 2010)
+Objectifs de Développement Durable (ODD)
+Ces textes constituent la grille d’interprétation neutre des actions humaines : la cohérence est définie par le respect simultané de la dignité humaine, de l’équilibre écologique et du progrès collectif.
 
-7. Pourquoi Ça Peut Marcher
-✅ Timing parfait : COP30, urgence climatique max 
-✅ Narrative puissant : "Premier token qui disparaît = victoire" 
-✅ Viral potential : Story + YouTube = croissance organique 
-✅ Alignement parfait : Impossible de profiter du désastre 
-✅ Solo faisable : Pas besoin d'équipe/millions au départ 
-✅ Authentique : Vous = Satoshi du climat, passion visible
+4. TOKENOMICS (Mainnet)
+4.1 Supply et répartition
+Supply initiale (Mainnet) : 1 000 000 CBWD (6 décimales)
+Répartition de genèse :
+≈ 2/3 pour la distribution, utilité et circulation contrôlée
+≈ 1/3 pour la trésorerie (tampon de burn)
+Toutes les métriques sont exprimées en unités brutes (base units). Les affichages publics divisent par 10⁶ pour afficher en CBWD.
+“Supply initiale Mainnet : 1 000 000 CBWD (6 décimales). À la genèse, environ deux tiers sont affectés à la distribution/utilité et un tiers à la réserve de burn. Les opérations mint/burn sont exécutées en unités brutes et publiées sur l’explorateur.”
+
+4.2 Mécanisme Mint/Burn
+Les événements validés par l’oracle 4D déclenchent un MINT ou BURN.
+Pondération par ODD / Chartes / contexte (local → global).
+Cap journalier paramétrable par gouvernance (plancher/plafond par 24 h).
+Lissage automatique (smoothing) pour éviter les spikes.
+File d’attente déterministe pour traitement ordonné.
+Tous les paramètres (cap, cadence, marges) sont publiés et audités.
+
+4.3 Mint-Split (1,5 %) — Soutenabilité humaine
+À chaque MINT, 1,5 % des unités sont réparties ainsi :
+
+Payroll : budget mensuel plafonné, décaissement CBWD→USDC publié (hash tx). Priorité : maintenance > sécurité > direction > R&D.
+Ce mécanisme assure la pérennité humaine du protocole sans altérer la logique autonome.
+
+4.4 Protocol-Owned Liquidity (POL)
+Paires CBWD/USDC déployées sur Raydium ou Orca.
+Frais de swap réinvestis dans Ops et Burn-Buffer.
+Politique prudente : pas de taxe utilisateur, exposition graduelle.
+
+4.5 Transparence et métriques publiques
 
 
-Conclusion : Le Pari
-CARBON parie sur l'intelligence collective de l'humanité.
-Si nous réussissons → Supply brûle, holders gagnent, monde sauvé Si nous échouons → Supply explose, tokens sans valeur, monde détruit
-Pour la première fois, cupidité = altruisme forcé.
+5. Utilité du protocole
+CBWD fournit une lecture mesurable du réel utilisable par tous :
 
-Contact : [carbon-token.] | [@CarbonCRBN] | [discord.gg/carbon]
-Fondateur : NEOUS AXIS Version : 1.0 - Octobre 2025
-Soutenance Opérationnelle et Financement Interne
 
-Objectif: assurer la pérennité du protocole (frais réseau, salaires, tampon de burn) sans dépendre d’une marketplace maison ni d’extensions spécifiques (ex. Token‑2022).
+6. Automatisation & Gouvernance
+Gouvernance
+Multi-sig sur les rôles critiques : mint authority, trésorerie.
+Conseil des validateurs : revue des événements, arbitrage, publication des justifications.
+Paramètres dynamiques : cap journalier, cadence, tampons, priorités de file d’attente.
+Automatisation
+Traitement périodique des événements en attente avec lissage automatique.
+Veto technique (arrêt d’urgence) en cas d’anomalies détectées.
+Conformité
+Publication continue des politiques (caps, bps, marges).
+Journalisation intégrale et audits réguliers.
+“Les opérations mint/burn en production requièrent multi-sig. La file d’attente est traitée automatiquement avec cap journalier et lissage ; un droit de veto technique est prévu en cas d’anomalies.”
 
-Pilier 1 — Mint‑Split à l’émission
-- À chaque émission (MINT), répartir le montant entre quatre poches:
-- Utilisateur (user_share) → crédité sur son ATA (CBWD).
-- Tampon de burn (burn_buffer_share) → crédité sur `TREASURY_TOKEN_ACCOUNT` pour absorber les futurs BURN (bonnes nouvelles).
-- Opérations (ops_share) → CBWD en trésorerie, converti périodiquement en SOL pour couvrir les frais réseau.
-- Salaires (payroll_share) → CBWD dédiés aux salaires, convertis en USDC/SOL pour la paie.
-- Paramétrage en basis points (bps):
-- `user = amount × (1 − y_bps − p_bps − b_bps)`
-- `burn_buffer = amount × b_bps`
-- `ops = amount × y_bps`
-- `payroll = amount × p_bps`
-- Exemple initial: `y=25 bps` (0,25%), `p=100 bps` (1,00%), `b=25 bps` (0,25%) → 1,50% de l’émission finance ops+salaires+tampon.
+7. Gouvernance & Sécurité
+Aucune intervention humaine dans les décisions de l’oracle.
+Multi-sig pour Ops et Payroll.
+Logs IA 4D signés et horodatés on-chain.
+Audits indépendants, bug bounty ouvert.
+Dashboard et API publics (lecture seule).
 
-Pilier 2 — Protocol‑Owned Liquidity (POL)
-- Déposer une fraction contrôlée de la trésorerie (CBWD + USDC/SOL) en LP sur Raydium/Orca.
-- Le protocole perçoit des frais de swap sur l’activité DEX, sans imposer de frais côté utilisateur.
-- Stratégie: paire CBWD/USDC pour limiter l’impermanent loss; taille de position graduelle; récolte périodique des fees en USDC/SOL.
+8. Rôle du fondateur
+Neous Axis : auteur du protocole et gardien de son intégrité. Aucun token réservé. Rémunération assurée via Payroll on-chain (Mint-Split) et activités externes : consulting, licences IA 4D, conférences, partenariats.
+9. Adresses & Publication
+Publication au TGE :
+mint (adresse du token CBWD) et treasury_ata (réserve burn) publiées à la genèse Mainnet.
+Adresses de distribution/utilité communiquées selon la stratégie (transparence vs confidentialité opérationnelle).
+Avertissement :
+Ne pas envoyer de fonds aux adresses de prototypage.
+Seules les adresses publiées sur carbon-token.xyz et l’explorateur Solana sont valides.
 
-Pilier 3 — Politique de tirage et de lissage
-- Définir des caps/jours de BURN basés sur le solde du tampon de burn.
-- Utiliser une file d’attente “pending”: si un BURN ne peut pas être exécuté (insufficient funds), il reste en attente et sera repris automatiquement dès que la trésorerie se recharge.
-- Conversion régulière CBWD→SOL (partie ops) pour alimenter le “Network Pool” (payer des frais réseau) via Jupiter.
-- Règle de draw‑down prudente: protéger un seuil minimal du tampon (ex. 20% du 1/3 initial) et lisser les sorties si besoin.
+10. Feuille de route 2025-2028
 
-Fallback Token‑2022 (Optionnel)
-- Si l’écosystème supporte largement SPL Token‑2022 Transfer Fee:
-- Appliquer un y% on‑chain sur chaque transfert (withheld), puis retirer périodiquement vers la trésorerie.
-- Convertir une fraction en SOL pour le Network Pool.
-- Si un jour Token‑2022 n’est plus supporté, les piliers 1–3 suffisent: la soutenabilité ne dépend pas d’un prélèvement on‑chain.
 
-Gouvernance & Paramètres Dynamiques
-- Ajuster `y_bps` si le solde SOL du payer est bas; ajuster `b_bps` si le tampon CBWD diminue; ajuster `p_bps` selon besoins de paie.
-- Exposer des métriques: `treasury_cbwd_balance`, `network_pool_sol_balance`, `pending_burns`, ratios de couverture (burn et frais réseau).
-- Mettre des alertes et un cron de reprise (`/process-pending`) pour garantir une continuité de service.
 
-Intégration Serveur (implémentée)
-- Endpoint `POST /mint-split` avec bps configurables:
-- Inputs: `recipient_token_account`, `amount_crbn` (unités de base).
-- Répartit automatique: utilisateur, trésorerie (tampon burn), ops, payroll.
-- DRY_RUN supporté; signatures réelles si secrets configurés.
-- Mise à jour automatique de la supply et de l’overview à partir de la chaîne (Supabase).
-- File d’attente et reprise: `POST /process-pending` traite les MINT/BURN en attente (tx_hash NULL) par lot.
-
-Résumé de Soutenabilité
-- Les coûts réseau et salaires sont financés à la source (mint‑split) et par POL; aucun frais imposé aux utilisateurs en SOL.
-- Le tampon burn garantit l’alignement “bonnes nouvelles → BURN” et “mauvaises nouvelles → MINT”, avec lissage si nécessaire.
-- La file d’attente empêche toute rupture du service: les événements non signés sont repris dès que les conditions sont réunies.
+11. Conclusion
+Carbon World Data (CBWD) inscrit l’état du monde dans une infrastructure autonome et transparente. Chaque événement, décision ou progrès collectif se traduit par une trace mesurable sur la blockchain : les choix humains deviennent des données.
+CBWD ne représente pas une idéologie, mais une structure de cohérence vivante : quand le monde agit en équilibre, la supply se contracte ; lorsqu’il dérive, elle s’étend.
+Une écriture continue du réel, auditable par tous.

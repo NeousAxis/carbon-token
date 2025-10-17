@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 const RPC_URL = 'https://api.devnet.solana.com';
-const MINT = 'HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs'; // CBWD (devnet)
+const MINT = '5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC'; // CBWD (devnet)
 const DECIMALS = 6;
 
 (async () => {

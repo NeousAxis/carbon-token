@@ -1,11 +1,12 @@
 # CARBON - Livre Blanc
 
-Le Token qui Mesure la Réalité Climatique
+L’Index du Vivant (social, géopolitique, vivant, économie)
 
 ## 1. Le Concept
-CARBON (CRBN) est un token Solana piloté par une IA qui mesure les actions climatiques mondiales :
-- ✅ Action positive → Tokens brûlés (supply ↓, valeur ↑)
-- ❌ Action négative → Tokens créés (supply ↑, valeur ↓)
+CARBON (CBWD) est un protocole et un token Solana piloté par une IA qui évalue des décisions publiques et des événements à travers les ODD et la Charte des droits fondamentaux des humains et de la nature de l’ONU. Portée : social, géopolitique, état du vivant, économie.
+- ✅ Décision alignée sur ODD/Charte (implémentée) → Tokens brûlés (supply ↓, valeur ↑)
+- ❌ Régression contraire aux droits/ODD (implémentée) → Tokens créés (supply ↑, valeur ↓)
+- ⚖️ Annonce future/conditionnelle ou recours → NEUTRAL (amount=0) jusqu’à vérification
 
 Le paradoxe révolutionnaire : Impossible de s'enrichir en pariant contre la planète. Si l'humanité échoue, le supply explose et la valeur s'effondre.
 
@@ -31,7 +32,7 @@ Supply résiduel : On n'atteindra jamais zéro (activité humaine incompressible
 
 Score futur : +6.25/10
 
-DÉCISION : BURN 315,000 CRBN
+DÉCISION : BURN 315,000 CBWD
 
 ### Humilité du Système
 CARBON peut se tromper car il reflète nos erreurs collectives. Chaque évaluation inclut :
@@ -40,26 +41,41 @@ CARBON peut se tromper car il reflète nos erreurs collectives. Chaque évaluati
 - Corrections publiques si erreur détectée
 - Sources et hypothèses transparentes
 
+## Sources & Méthode IA
+- Cadre normatif : ODD + Charte des droits fondamentaux des humains et de la nature de l’ONU
+- Portée : progrès sociaux, stabilité géopolitique, état du vivant, dynamiques économiques
+- Collecte : flux RSS sélectionnés, communiqués officiels, rapports et bases publiques (ONU, OMS, FAO, UNESCO, bases nationales)
+- Pipeline : collecte → déduplication → normalisation → classification → score 4D (pondérations 25/20/15/40) → décision (BURN/MINT/NEUTRAL)
+- Sortie : JSON strict (response_format = json_object), champs : titre, source, pays/région, orientation, statut, score, décision, amount_crbn, justifications
+- Transparence : journal public des événements, sources et hypothèses; triggers de réévaluation; versionnage des prompts et des modèles
+- Neutralité : annonces futures/conditionnelles/recours = NEUTRAL (amount=0) jusqu’à implémentation vérifiée
+
+## Gouvernance (Conseil/DAO)
+- Conseil des validateurs : revue des événements, arbitrage des cas limites, publication des justifications
+- Processus : proposition → revue → vote (quorum/seuils) → exécution; appels possibles (NEUTRAL) avec réévaluation
+- Paramètres dynamiques : caps journaliers, tampon de burn, file d’attente des événements (pending) et reprise automatique
+- Transparence : métriques publiques (pending_burns/mints, trésorerie, couverture), rapports réguliers, droit de veto technique en cas d’anomalie
+
 ## 3. TOKENOMICS
 ### Supply et Distribution
-Supply Initial : 1,000,000,000 CRBN
+Supply Initial : 1,000,000,000 CBWD
 
 ### Mécanisme Burn/Mint
 Échelle d'Impact :
-- Local (ville) : 1K-10K CRBN
-- Régional : 10K-100K CRBN
-- National : 100K-1M CRBN
-- International : 1M-10M CRBN
+- Local (ville) : 1K-10K CBWD
+- Régional : 10K-100K CBWD
+- National : 100K-1M CBWD
+- International : 1M-10M CBWD
 
 Modulation contextuelle : Même action = impact différent selon pays (pop, PIB, émissions actuelles)
 
 ### Revenus Fondateur
-1. Vesting Tokens (100M CRBN)
-   - Année 1-4 : 25M CRBN/an débloqués
-   - Valeur potentielle :
-     - Bear ($0.01) : $250K/an → $1M total
-     - Base ($0.10) : $2.5M/an → $10M total
-     - Bull ($1.00) : $25M/an → $100M total
+1. Vesting Tokens (100M CBWD)
+- Année 1-4 : 25M CBWD/an débloqués
+- Valeur potentielle :
+  - Bear ($0.01) : $250K/an → $1M total
+  - Base ($0.10) : $2.5M/an → $10M total
+  - Bull ($1.00) : $25M/an → $100M total
 
 2. Frais Transaction (Optionnel)
    - 0.05% sur swaps DEX → wallet fondateur
@@ -82,7 +98,7 @@ Compétences nécessaires :
 
 Coûts incompressibles :
 - Domaine + site : 15 CHF/an (Infomaniak)
-- Liquidité DEX initiale : $2K-5K minimum (SOL + CRBN)
+- Liquidité DEX initiale : $2K-5K minimum (SOL + CBWD)
 - Total minimum : 675 CHF (sur 6 mois)
 
 ### Phase 2 : Bootstrapping
@@ -127,10 +143,10 @@ Si nous réussissons → Supply brûle, holders gagnent, monde sauvé.
 
 Si nous échouons → Supply explose, tokens sans valeur, monde détruit.
 
-Pour la première fois, cupidité = altruisme forcé.
+Pour la première fois, l'altruisme peut devenir un moteur économique.
 
 ---
-Contact : [carbon-token.] | [@CarbonCRBN] | [discord.gg/carbon]
+Contact : [carbon-token.] | [@CarbonCBWD] | [discord.gg/carbon]
 
 Fondateur : NEOUS AXIS
 

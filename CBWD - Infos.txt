@@ -14,9 +14,9 @@ Clé dédiée au projet
 - Solde actuel: 2 SOL
 
 Mint CBWD (SPL Token)
-- Adresse du mint (MINT): HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+- Adresse du mint (MINT): 5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC
 - Décimales: 6
-- Compte associé du trésor (ATA): 2iNtuKTthWRGiDoK4VZYQJ7dC8t4d2DkR1dbLQx5QqFK
+- Compte associé du trésor (ATA): J3uAiWJJkmeQgDgPwGBBrv5mQTF9Rqjard8VBBFZ5B6a
 
 Supply de test frappée
 - 6 décimales ⇒ 1 CBWD = 1,000,000 unités
@@ -57,9 +57,9 @@ Clé dédiée au projet
 - Solde actuel: 2 SOL
 
 Mint CBWD (SPL Token)
-- Adresse du mint (MINT): HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+- Adresse du mint (MINT): 5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC
 - Décimales: 6
-- Compte associé du trésor (ATA): 2iNtuKTthWRGiDoK4VZYQJ7dC8t4d2DkR1dbLQx5QqFK
+- Compte associé du trésor (ATA): J3uAiWJJkmeQgDgPwGBBrv5mQTF9Rqjard8VBBFZ5B6a
 
 Supply de test frappée
 - 6 décimales ⇒ 1 CBWD = 1,000,000 unités
@@ -68,7 +68,7 @@ Supply de test frappée
 - Signature de mint: NgeZqq9iKSGxLxc7qQ4LgYjDmwNJQA2ZwVnNKHxCdET3pfQ9buczyGTGJSzT4vL5DsbvASk8kzB555Fn1rCNLQM
 
 Vérifications des comptes SPL
-- Résultat: le compte trésor affiche 1,000,000,000 unités pour le mint HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs
+- Résultat: le compte trésor affiche 1,000,000,000 unités pour le mint 5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC
 
 Notes de sécurité
 - La seed phrase de la clé n’est PAS incluse dans ce fichier.

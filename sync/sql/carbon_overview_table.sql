@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS public.carbon_overview (
   total_burns bigint NOT NULL DEFAULT 0,
   total_minted bigint NOT NULL DEFAULT 0,
   total_burned bigint NOT NULL DEFAULT 0,
+  -- Pending counters (events not yet confirmed on-chain: tx_hash IS NULL)
+  pending_events bigint NOT NULL DEFAULT 0,
+  pending_mints bigint NOT NULL DEFAULT 0,
+  pending_burns bigint NOT NULL DEFAULT 0,
+  pending_minted bigint NOT NULL DEFAULT 0,
+  pending_burned bigint NOT NULL DEFAULT 0,
   last_update timestamptz NOT NULL DEFAULT now()
 );
 
@@ -28,3 +34,10 @@ END $$;
 
 -- Tip: you can also pre-create the row for your mint to avoid INSERT policies
 -- INSERT INTO public.carbon_overview (mint_address) VALUES ('5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC') ON CONFLICT DO NOTHING;
+
+-- Migration helper: ensure pending columns exist if table was created before
+ALTER TABLE public.carbon_overview ADD COLUMN IF NOT EXISTS pending_events bigint NOT NULL DEFAULT 0;
+ALTER TABLE public.carbon_overview ADD COLUMN IF NOT EXISTS pending_mints bigint NOT NULL DEFAULT 0;
+ALTER TABLE public.carbon_overview ADD COLUMN IF NOT EXISTS pending_burns bigint NOT NULL DEFAULT 0;
+ALTER TABLE public.carbon_overview ADD COLUMN IF NOT EXISTS pending_minted bigint NOT NULL DEFAULT 0;
+ALTER TABLE public.carbon_overview ADD COLUMN IF NOT EXISTS pending_burned bigint NOT NULL DEFAULT 0;

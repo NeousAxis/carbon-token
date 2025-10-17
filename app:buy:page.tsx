@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 
 export default function Buy() {
   useEffect(() => {
-    // Redirection automatique vers Jupiter avec CRBN pré-sélectionné
-    const jupiterUrl = `https://jup.ag/swap/SOL-CRBN_MINT_ADDRESS_ICI`
+    // Redirection automatique vers Jupiter avec CBWD pré-sélectionné
+    const jupiterUrl = `https://jup.ag/swap/SOL-CBWD_MINT_ADDRESS_ICI`
     window.location.href = jupiterUrl
   }, [])
 

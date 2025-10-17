@@ -32,7 +32,7 @@ export default async function Dashboard() {
         <StatCard 
           title="Supply Actuel" 
           value={currentSupply.toLocaleString()} 
-          subtitle="CRBN"
+          subtitle="CBWD"
         />
         <StatCard 
           title="Total Brûlé" 

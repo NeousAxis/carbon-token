@@ -4,6 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Carbon World Dashboard</title>
+  <link rel="icon" href="./FAVICON.png" type="image/png" />
+  <link rel="shortcut icon" href="./FAVICON.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./FAVICON.png" />
+  <meta name="theme-color" content="#0E1116" />
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; background: #0E1116; color: #EDEFF3; }
     .container { max-width: 1100px; margin: 0 auto; }
@@ -27,12 +31,55 @@
     .stat { background: #10141B; border: 1px solid #232B36; border-radius: 12px; padding: 14px; }
     .stat-label { color: #9CB2CF; font-size: 13px; margin-bottom: 6px; }
     .stat-value { font-size: 22px; font-weight: 700; }
+    .header { display: flex; align-items: center; gap: 16px; }
+    .logo { height: 384px; width: auto; max-width: 100%; border-radius: 12px; }
+    .header h1 { font-size: 20px; margin: 0; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .info-card { background: #10141B; border: 1px solid #232B36; border-radius: 12px; padding: 14px; }
+    .info-card-wide { grid-column: 1 / -1; }
+    .info-card h3 { color: #9CB2CF; font-size: 15px; margin-bottom: 8px; }
+    .info-card p { font-size: 14px; line-height: 1.5; }
+    /* Style de la phrase-slogan pour la faire ressortir */
+    .slogan { font-family: Georgia, "Times New Roman", serif; font-size: 18px; line-height: 1.5; }
+    /* Badge de statut (Automatisation) */
+    .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; font-weight: 600; }
+    .status-badge.on { background: #15341F; color: #55D187; border: 1px solid #1E5631; }
+    .status-badge.off { background: #3B2121; color: #FF8A8A; border: 1px solid #6B2C2C; }
+    .card h2 { display: flex; align-items: center; gap: 8px; }
+    /* Responsive logo size */
+    @media (max-width: 768px) { .logo { height: 256px; } }
+    @media (max-width: 480px) { .logo { height: 160px; } }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Carbon World Dashboard</h1>
-    <p class="muted">Visualisation des données on-chain et IA (Devnet)</p>
+    <div class="header">
+      <img src="./LOGO%20TRANSPARENT.png" alt="Logo Carbon World" class="logo" />
+      <h1>Carbon World Dashboard</h1>
+    </div>
+    <p class="muted slogan">Pour la première fois, le Bien Commun peut devenir un moteur économique.</p>
+
+    <div class="card">
+      <h2>Comprendre le projet</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>Principe</h3>
+          <p>Imaginez si, partout dans le monde, les décisions prises par les gouvernements en faveur des droits humains et de l'environnement devenaient le moteur économique.</p>
+        </div>
+        <div class="info-card">
+          <h3>Alignement</h3>
+          <p>Imaginez un système où il est impossible de parier contre la planète et où l'intérêt privé supporte l'intérêt général.</p>
+        </div>
+        <div class="info-card">
+          <h3>Traçabilité & Analyse mondiale</h3>
+          <p>Carbon World analyse chaque événement à travers les ODD (Objectifs de Développement Durable), la Charte des droits fondamentaux des humains et de la nature de l'ONU.</p>
+        </div>
+        <div class="info-card info-card-wide">
+          <h3>Décisions publiques et valeur du token</h3>
+          <p>Les décisions des gouvernements alignées sur les ODD réduisent le nombre de tokens Carbon World (burn), augmentant sa valeur. À l’inverse, les décisions contraires aux droits fondamentaux des humains et de la nature augmentent le nombre de tokens (mint) et réduisent sa valeur.</p>
+        </div>
+      </div>
+    </div>
 
     <div class="card">
       <h2>Prix</h2>
@@ -46,21 +93,23 @@
     <div class="card">
       <h2>Statistiques</h2>
       <div id="stats-content" class="stats-grid">Chargement…</div>
+      <p class="muted">Données du projet on-chain et IA (Prototype : Devnet)</p>
     </div>
 
     <div class="card">
-      <h2>Automatisation</h2>
+      <h2>Automatisation <span id="auto-status-badge" class="status-badge off" title="">Désactivé</span></h2>
       <div id="auto-content" class="stats-grid">
         <div class="stat"><div class="stat-label">MINTs en attente</div><div class="stat-value" id="auto-mints">—</div></div>
         <div class="stat"><div class="stat-label">BURNs en attente</div><div class="stat-value" id="auto-burns">—</div></div>
         <div class="stat"><div class="stat-label">Trésorerie (CBWD)</div><div class="stat-value" id="auto-treasury">—</div></div>
-        <div class="stat"><div class="stat-label">Statut</div><div class="stat-value" id="auto-status">—</div></div>
       </div>
       <div style="margin-top:12px; display:flex; gap:8px;">
         <button id="btn-run-auto" style="background:#1E5631; color:#EDEFF3; border:1px solid #2E7A47; padding:8px 12px; border-radius:8px; cursor:pointer;">Exécuter maintenant</button>
         <button id="btn-refresh-auto" style="background:#232B36; color:#EDEFF3; border:1px solid #2F3A48; padding:8px 12px; border-radius:8px; cursor:pointer;">Rafraîchir</button>
+        <button id="btn-ai-health" style="background:#2A3B4F; color:#EDEFF3; border:1px solid #3C506B; padding:8px 12px; border-radius:8px; cursor:pointer;">Tester AI</button>
       </div>
       <p class="muted" id="auto-last">Dernier run: —</p>
+      <p class="muted" id="ai-health">AI: —</p>
     </div>
 
     <div class="card">

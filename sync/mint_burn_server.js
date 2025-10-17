@@ -16,7 +16,7 @@ try {
     ADDR_JSON = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
   }
 } catch (_) {}
-const CBWD_MINT = process.env.CBWD_MINT || (ADDR_JSON && ADDR_JSON.mint) || 'HRqmMnbA18VgstcfjCueAuzVZEoHHbLbbu973AqmK3Fs';
+const CBWD_MINT = process.env.CBWD_MINT || (ADDR_JSON && ADDR_JSON.mint) || '5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC';
 const TREASURY_TOKEN_ACCOUNT = process.env.TREASURY_TOKEN_ACCOUNT || (ADDR_JSON && ADDR_JSON.treasury_ata) || '';
 const DECIMALS = process.env.CBWD_DECIMALS ? parseInt(process.env.CBWD_DECIMALS) : (ADDR_JSON && ADDR_JSON.decimals) || 6;
 const DRY_RUN = (process.env.DRY_RUN || 'false').toLowerCase() === 'true';
@@ -93,6 +93,39 @@ app.get('/supply', async (req, res) => {
   }
 });
 
+// AI healthcheck via OpenRouter
+app.get('/ai/health', async (req, res) => {
+  try {
+    const key = (process.env.OPENROUTER_KEY || '').trim();
+    if (!key) return res.status(400).json({ ok: false, error: 'missing_openrouter_key' });
+    const url = 'https://openrouter.ai/api/v1/chat/completions';
+    const body = {
+      model: 'openai/gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a simple healthcheck responder.' },
+        { role: 'user', content: 'Reply with OK' }
+      ],
+      max_tokens: 3,
+      temperature: 0
+    };
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    let json = null;
+    try { json = await resp.json(); } catch (_) {}
+    const content = json?.choices?.[0]?.message?.content || '';
+    const okMsg = typeof content === 'string' && content.trim().toUpperCase().includes('OK');
+    res.json({ ok: resp.ok && okMsg, status: resp.status, content, usage: json?.usage || null });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: String(e?.message || e) });
+  }
+});
+
 // Helper: recount overview stats from carbon_events and write to carbon_overview table
 async function recountOverview() {
   if (!supabase) return { ok: false, reason: 'supabase_not_configured' };
@@ -135,21 +168,74 @@ async function recountOverview() {
 
     const total_events = Number(mintCount || 0) + Number(burnCount || 0);
 
+    // Pending counters (tx_hash IS NULL)
+    async function countPending(decision) {
+      const { data, error } = await supabase
+        .from('carbon_events')
+        .select('amount_crbn')
+        .is('tx_hash', null)
+        .eq('decision', decision);
+      if (error) throw error;
+      const rows = Array.isArray(data) ? data : [];
+      const sum = rows.reduce((acc, r) => acc + Number(r.amount_crbn || 0), 0);
+      return { count: rows.length, sum };
+    }
+    const pMints = await countPending('MINT');
+    const pBurns = await countPending('BURN');
+    const pending_events = Number(pMints.count || 0) + Number(pBurns.count || 0);
+
+    // Detect if pending columns exist in carbon_overview to avoid write errors
+    let hasPendingCols = false;
+    try {
+      const { error: pendingColErr } = await supabase
+        .from('carbon_overview')
+        .select('pending_mints')
+        .eq('mint_address', CBWD_MINT)
+        .limit(1);
+      hasPendingCols = !pendingColErr;
+    } catch (_) {
+      hasPendingCols = false;
+    }
+
+    const payload = {
+      mint_address: CBWD_MINT,
+      current_supply: supplyRaw,
+      total_events,
+      total_mints: Number(mintCount || 0),
+      total_burns: Number(burnCount || 0),
+      total_minted,
+      total_burned,
+      last_update: nowIso
+    };
+    if (hasPendingCols) {
+      Object.assign(payload, {
+        pending_events,
+        pending_mints: Number(pMints.count || 0),
+        pending_burns: Number(pBurns.count || 0),
+        pending_minted: Number(pMints.sum || 0),
+        pending_burned: Number(pBurns.sum || 0)
+      });
+    }
+
     const { error: ovErr } = await supabase
       .from('carbon_overview')
-      .upsert({
-        mint_address: CBWD_MINT,
-        current_supply: supplyRaw,
-        total_events,
-        total_mints: Number(mintCount || 0),
-        total_burns: Number(burnCount || 0),
-        total_minted,
-        total_burned,
-        last_update: nowIso
-      }, { onConflict: 'mint_address' });
+      .upsert(payload, { onConflict: 'mint_address' });
     if (ovErr) throw ovErr;
 
-    return { ok: true, total_events, total_mints: Number(mintCount || 0), total_burns: Number(burnCount || 0), total_minted, total_burned, current_supply: supplyRaw };
+    return {
+      ok: true,
+      total_events,
+      total_mints: Number(mintCount || 0),
+      total_burns: Number(burnCount || 0),
+      total_minted,
+      total_burned,
+      current_supply: supplyRaw,
+      pending_events,
+      pending_mints: Number(pMints.count || 0),
+      pending_burns: Number(pBurns.count || 0),
+      pending_minted: Number(pMints.sum || 0),
+      pending_burned: Number(pBurns.sum || 0)
+    };
   } catch (e) {
     return { ok: false, error: String(e?.message || JSON.stringify(e)) };
   }
