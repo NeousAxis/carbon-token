@@ -1,0 +1,16 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "RAILPACK",
+    "watchPatterns": ["sync/**"]
+  },
+  "deploy": {
+    "preDeployCommand": [
+      "sh -lc \"[ -d sync ] && cd sync; npm ci\""
+    ],
+    "startCommand": "sh -lc \"[ -d sync ] && cd sync; PORT=${PORT:-8080} node mint_burn_server.js\"",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 180,
+    "restartPolicyType": "ON_FAILURE"
+  }
+}

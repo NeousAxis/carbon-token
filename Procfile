@@ -1,0 +1,1 @@
+web: sh -lc "[ -d sync ] && cd sync; PORT=${PORT:-8080} node mint_burn_server.js"
