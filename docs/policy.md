@@ -32,3 +32,17 @@ Cette politique vise un comportement simple, solide et durable.
 ## Sécurité opérationnelle
 - En cas d’incertitude: basculer en `DRY_RUN=true` et/ou désactiver `AUTO_ENABLED`.
 - Toujours éviter les décisions au cas par cas non traçables.
+
+## Exemple .env (policy)
+```
+# Policy and compliance
+POLICY_ALLOW_SOURCES="sdg,un,human_rights,nature_rights" # allowlist pour MINT
+BURN_SOURCE="ops" # source des burns: treasury|ops|payroll
+AUTO_TOPUP_EXTRA_BPS="0" # marge de top-up si BURN_SOURCE=treasury
+
+# Auto-run (exemple)
+AUTO_ENABLED="true"
+AUTO_INTERVAL_MS="25000"
+AUTO_MINT_LIMIT="5"
+AUTO_BURN_LIMIT="12"
+```
