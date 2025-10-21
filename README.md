@@ -68,5 +68,10 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 - `BURN_SOURCE` et la politique garantissent prudence opérationnelle.
 - En cas d’anomalie, droit de veto technique: bascule en `DRY_RUN` et/OU suspension auto-run.
 
+## Documentation
+- `CONTRIBUTING.md` pour les pratiques et la cohérence.
+- `docs/policy.md` pour la politique et l’allowlist.
+- `docs/api.md` pour les endpoints et exemples.
+
 ---
 Ce README définit les règles, la supply, les calculs et la politique par défaut pour assurer simplicité, solidité et durabilité. Toute évolution doit maintenir la cohérence: on-chain comme off-chain.
