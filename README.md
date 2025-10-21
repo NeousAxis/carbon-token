@@ -74,6 +74,7 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 - `docs/api.md` pour les endpoints et exemples.
 
 ## Changelog
+- v0.1 (2025-10-21) — Baseline documentation
 - Refonte README avec règles IA, supply/policy, API et configuration.
 - Ajout `CONTRIBUTING.md` et docs de base (`docs/policy.md`, `docs/api.md`).
 - Mise à jour `sync/.env.example` avec `POLICY_ALLOW_SOURCES`, `BURN_SOURCE`, `AUTO_TOPUP_EXTRA_BPS`.
