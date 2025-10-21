@@ -8,12 +8,25 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 - Annonce future/conditionnelle/recours → `NEUTRAL` (amount = 0) jusqu’à vérification
 - Transparence systémique: sources, hypothèses et clause de faillibilité publiées; réévaluations périodiques
 
+## Règle Canonique — Conformité au Livre Blanc
+- Aucune liberté: tout est défini par le Livre Blanc; le code et l’opération s’y conforment strictement.
+- Interdit: créer/rotater une nouvelle mint, modifier `CBWD_MINT` ou des adresses sans gouvernance écrite et référence explicite au Livre Blanc.
+- Exigé: toute évolution doit référencer une section du Livre Blanc dans le README et le changelog, et être validée avant exécution.
+- Source de vérité actuelle (devnet): `CBWD_MINT=5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC` (mint d’origine: 1 000 000 CBWD) — jusqu’à publication d’une migration officielle.
+- Procédure de contrôle après changement autorisé: exécuter `POST /cleanup-overview`, `POST /cleanup-supply-devnet`, puis `POST /recount-overview`, et vérifier `GET /overview` (cohérence on-chain/off-chain).
+
 ## Supply & Calculs (cohérence)
 - Mint canonique: `CBWD_MINT` (décimales `CBWD_DECIMALS`, par défaut 6). La supply lue est l’on-chain sur cette mint.
+  - Devnet (origine du projet): `5bRPS8YnNMYZm6Mw86jkJMJpj9ZpCmq7Wj78gNAFnjHC` (1’000’000 CBWD frappés).
+  - Assure la cohérence: `.env`, `site-carbon-world/main.js`, `sync/.env.example`, `cbwd-addresses.json` doivent tous pointer vers cette mint.
 - Événements comptabilisés si et seulement si `tx_hash` non nul (signé on-chain): totaux `total_minted`/`total_burned` et `total_mints`/`total_burns` dérivés de `carbon_events`.
 - Tables Supabase:
   - `carbon_supply`: `upsert(mint_address=current_supply,last_update)` après chaque tx
   - `carbon_overview`: recomptage via `/recount-overview` après chaque tx
+- Nettoyage (si doublons de mint visibles dans Supabase):
+  - `POST /cleanup-overview` avec `{ keepMint: CBWD_MINT }` pour garder une seule ligne.
+  - `POST /cleanup-supply-devnet` avec `{ keepMint: CBWD_MINT }` pour la table `carbon_supply`.
+  - Puis `POST /recount-overview` pour régénérer les compteurs.
 - Échelle d’impact indicative (base units CRBN):
   - Local (ville): 1K–10K | Régional: 10K–100K | National: 100K–1M | International: 1M–10M
 - Tampon de burn (top-up): auto-mint de couverture uniquement si `BURN_SOURCE=treasury` (paramètre `AUTO_TOPUP_EXTRA_BPS` pour marge). Sinon, aucun top-up.
@@ -44,7 +57,7 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 ## Configuration (.env)
 - Identités & réseau: `SOLANA_RPC_URL`, `CBWD_MINT`, `CBWD_DECIMALS`
 - Autorités & comptes: `MINT_AUTHORITY_SECRET_KEY`, `TREASURY_TOKEN_ACCOUNT`, `TREASURY_OWNER_SECRET_KEY`, `OPS_TOKEN_ACCOUNT`, `PAYROLL_TOKEN_ACCOUNT`, `PAYER_SECRET_KEY`
-- Politique & exécution: `BURN_SOURCE=treasury|ops|payroll`, `POLICY_ALLOW_SOURCES`, `AUTO_ENABLED`, `AUTO_INTERVAL_MS`, `AUTO_BURN_LIMIT`, `AUTO_MINT_LIMIT`, `AUTO_TOPUP_EXTRA_BPS`
+- Politique & exécution: `BURN_SOURCE=treasury|ops|payroll`, `POLICY_ALLOW_SOURCES`, `POLICY_BURN_ALLOWED_SOURCES` (joker `*` accepté), `POLICY_STRICT_BURN`, `AUTO_ENABLED`, `AUTO_INTERVAL_MS`, `AUTO_BURN_LIMIT`, `AUTO_MINT_LIMIT`, `AUTO_TOPUP_EXTRA_BPS`
 - Split BPS: `OPS_BPS`, `PAYROLL_BPS`, `BURN_BUFFER_BPS` (10000 = 100%)
 - Supabase: `SUPABASE_URL`, `SUPABASE_KEY` (service role ou anon selon besoin)
 
@@ -52,12 +65,14 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 - Créer une mint + ATA trésorerie et auto-écrire `.env`:
   - `AUTO_WRITE_ENV=true node sync/create_devnet_mint.js`
 - Lancer le serveur:
-  - `PORT=3334 BURN_SOURCE=ops DRY_RUN=false node sync/mint_burn_server.js`
+  - `PORT=3333 BURN_SOURCE=ops DRY_RUN=false node sync/mint_burn_server.js`
 - Vérifier: `GET /auto/status`, `GET /pending-summary`, `GET /overview`
 
-## Cadre IA (4D)
-- Pondérations: Snapshot 25%, Trajectoire 20%, Réévaluation 15%, Prospective 40%.
-- Pipeline: collecte → déduplication → normalisation → classification → score 4D → décision (BURN/MINT/NEUTRAL) → on-chain.
+## Politique IA
+- Décision fondée sur l’analyse du contenu (ODD/Chartes), indépendamment de la source si configuré.
+- En cas d’incertitude: `NEUTRAL` par défaut; (les endpoints de revue existent mais peuvent être ignorés en mode auto).
+- BURN peut ignorer la source si `POLICY_BURN_ALLOWED_SOURCES='*'`; `POLICY_STRICT_BURN=true` exige `actor_type` state|institution.
+- Voir `docs/policy.md` pour les détails et la configuration (`POLICY_ALLOW_SOURCES`, `POLICY_BURN_ALLOWED_SOURCES`, `POLICY_STRICT_BURN`).
 
 ## Gouvernance & Réévaluation
 - Conseils/validateurs: revue, arbitrage, publication des justifications.
@@ -82,3 +97,15 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 
 ---
 Ce README définit les règles, la supply, les calculs et la politique par défaut pour assurer simplicité, solidité et durabilité. Toute évolution doit maintenir la cohérence: on-chain comme off-chain.
+
+## Ports
+
+- Static site: `8080`
+- API serveur (mint/burn): `3333` uniquement
+
+### Démarrage rapide
+
+- Lancer le site statique: `cd site-carbon-world && python3 -m http.server 8080`
+- Lancer le serveur API: `PORT=3333 AUTO_ENABLED=true node sync/mint_burn_server.js`
+
+Politique de ports: ne pas lancer d’autres instances sur `3334`/`3335`.
