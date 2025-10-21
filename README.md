@@ -1,153 +1,72 @@
-# CARBON - Livre Blanc
+# CARBON (CBWD) — Agent IA & Token Solana
 
-L’Index du Vivant (social, géopolitique, vivant, économie)
+CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue des décisions et événements à l’aune des ODD (SDG) et des chartes universelles des droits des humains et de la nature, puis agit on-chain.
 
-## 1. Le Concept
-CARBON (CBWD) est un protocole et un token Solana piloté par une IA qui évalue des décisions publiques et des événements à travers les ODD et la Charte des droits fondamentaux des humains et de la nature de l’ONU. Portée : social, géopolitique, état du vivant, économie.
-- ✅ Décision alignée sur ODD/Charte (implémentée) → Tokens brûlés (supply ↓, valeur ↑)
-- ❌ Régression contraire aux droits/ODD (implémentée) → Tokens créés (supply ↑, valeur ↓)
-- ⚖️ Annonce future/conditionnelle ou recours → NEUTRAL (amount=0) jusqu’à vérification
+## Règles Fondamentales
+- Aligne avec ODD/Chartes (implémenté et vérifié) → `BURN` des tokens (supply ↓, valeur ↑)
+- Régression contraire aux droits/ODD (implémentée) → `MINT` des tokens (supply ↑, valeur ↓)
+- Annonce future/conditionnelle/recours → `NEUTRAL` (amount = 0) jusqu’à vérification
+- Transparence systémique: sources, hypothèses et clause de faillibilité publiées; réévaluations périodiques
 
-Le paradoxe révolutionnaire : Impossible de s'enrichir en pariant contre la planète. Si l'humanité échoue, le supply explose et la valeur s'effondre.
+## Supply & Calculs (cohérence)
+- Mint canonique: `CBWD_MINT` (décimales `CBWD_DECIMALS`, par défaut 6). La supply lue est l’on-chain sur cette mint.
+- Événements comptabilisés si et seulement si `tx_hash` non nul (signé on-chain): totaux `total_minted`/`total_burned` et `total_mints`/`total_burns` dérivés de `carbon_events`.
+- Tables Supabase:
+  - `carbon_supply`: `upsert(mint_address=current_supply,last_update)` après chaque tx
+  - `carbon_overview`: recomptage via `/recount-overview` après chaque tx
+- Échelle d’impact indicative (base units CRBN):
+  - Local (ville): 1K–10K | Régional: 10K–100K | National: 100K–1M | International: 1M–10M
+- Tampon de burn (top-up): auto-mint de couverture uniquement si `BURN_SOURCE=treasury` (paramètre `AUTO_TOPUP_EXTRA_BPS` pour marge). Sinon, aucun top-up.
 
-Supply résiduel : On n'atteindra jamais zéro (activité humaine incompressible = ~20% supply plancher).
+## Politique & Conformité (automatique)
+- Allowlist des sources pour MINT: `POLICY_ALLOW_SOURCES` (par défaut `sdg,un,human_rights,nature_rights`).
+- `BURN` est toujours autorisé; `MINT` est filtré par la politique (les événements dont `event_source` n’est pas autorisé sont ignorés).
+- `NEUTRAL`: aucun mouvement on-chain; l’événement reste traçable.
 
-## 2. L'Agent IA 4D
-### Les 4 Dimensions d'Analyse
-1. SNAPSHOT (25%) - Impact aujourd'hui avec technologies actuelles
-2. TRAJECTOIRE (20%) - Direction du mouvement (amélioration ou régression ?)
-3. RÉÉVALUATION (15%) - Suivi tous les 2 ans + triggers pour corrections
-4. PROSPECTIVE (40%) - Simulation de 3 futurs possibles sur 2-30 ans
+## Automatisation
+- `autoCycle`:
+  - Lit les pending, calcule déficit trésorerie vs burns; top-up mint si `burn_source=treasury`.
+  - Traite les `BURN` sans condition.
+  - Traite les `MINT` uniquement s’ils passent la politique (`POLICY_ALLOW_SOURCES`).
+- Contrôles: `GET /auto/status` expose intervalle, limites, `burn_source`, `policy_allow_sources`; `POST /auto/run` force un cycle.
 
-### Exemple Concret
-Événement : "France interdit vols intérieurs courts"
+## API (principales)
+- `POST /apply-decision` → applique une décision unique `{decision, amount_crbn, event_id?}`
+- `POST /process-pending` → traite la file (MINT/BURN) avec limite
+- `GET /pending-summary` → compte et somme des pending, solde trésorerie
+- `GET /overview` → adresses, soldes, liens explorer et métriques
+- `POST /recount-overview` → recompute l’overview depuis `carbon_events`
+- `POST /normalize-pending-mint` → fusionne doublons MINT pending en un seul
+- `POST /cleanup-supply-devnet` → garde une seule ligne supply pour la mint Devnet
+- `POST /mint-split` → mint réparti (user/treasury/ops/payroll) selon BPS
+- `GET /policy/status` → expose l’allowlist et le mode strict
 
-1. Présent : +6/10 (réduction CO2 directe)
-2. Trajectoire : +8/10 (signal fort transport propre)
-3. Suivi : Triggers activés (respect application)
-4. Prospective :
-   - Scénario A (70%) : Succès, modèle copié → +8/10
-   - Scénario B (25%) : Exceptions accumulent → +3/10
-   - Scénario C (5%) : Abandon politique → -2/10
+## Configuration (.env)
+- Identités & réseau: `SOLANA_RPC_URL`, `CBWD_MINT`, `CBWD_DECIMALS`
+- Autorités & comptes: `MINT_AUTHORITY_SECRET_KEY`, `TREASURY_TOKEN_ACCOUNT`, `TREASURY_OWNER_SECRET_KEY`, `OPS_TOKEN_ACCOUNT`, `PAYROLL_TOKEN_ACCOUNT`, `PAYER_SECRET_KEY`
+- Politique & exécution: `BURN_SOURCE=treasury|ops|payroll`, `POLICY_ALLOW_SOURCES`, `AUTO_ENABLED`, `AUTO_INTERVAL_MS`, `AUTO_BURN_LIMIT`, `AUTO_MINT_LIMIT`, `AUTO_TOPUP_EXTRA_BPS`
+- Split BPS: `OPS_BPS`, `PAYROLL_BPS`, `BURN_BUFFER_BPS` (10000 = 100%)
+- Supabase: `SUPABASE_URL`, `SUPABASE_KEY` (service role ou anon selon besoin)
 
-Score futur : +6.25/10
+## Démarrage Devnet (rapide)
+- Créer une mint + ATA trésorerie et auto-écrire `.env`:
+  - `AUTO_WRITE_ENV=true node sync/create_devnet_mint.js`
+- Lancer le serveur:
+  - `PORT=3334 BURN_SOURCE=ops DRY_RUN=false node sync/mint_burn_server.js`
+- Vérifier: `GET /auto/status`, `GET /pending-summary`, `GET /overview`
 
-DÉCISION : BURN 315,000 CBWD
+## Cadre IA (4D)
+- Pondérations: Snapshot 25%, Trajectoire 20%, Réévaluation 15%, Prospective 40%.
+- Pipeline: collecte → déduplication → normalisation → classification → score 4D → décision (BURN/MINT/NEUTRAL) → on-chain.
 
-### Humilité du Système
-CARBON peut se tromper car il reflète nos erreurs collectives. Chaque évaluation inclut :
-- Score de confiance (1-10)
-- Clause de faillibilité inscrite on-chain
-- Corrections publiques si erreur détectée
-- Sources et hypothèses transparentes
+## Gouvernance & Réévaluation
+- Conseils/validateurs: revue, arbitrage, publication des justifications.
+- Triggers de suivi: annonces conditionnelles ⇒ `NEUTRAL` jusqu’à implémentation; réévaluation périodique.
 
-## Sources & Méthode IA
-- Cadre normatif : ODD + Charte des droits fondamentaux des humains et de la nature de l’ONU
-- Portée : progrès sociaux, stabilité géopolitique, état du vivant, dynamiques économiques
-- Collecte : flux RSS sélectionnés, communiqués officiels, rapports et bases publiques (ONU, OMS, FAO, UNESCO, bases nationales)
-- Pipeline : collecte → déduplication → normalisation → classification → score 4D (pondérations 25/20/15/40) → décision (BURN/MINT/NEUTRAL)
-- Sortie : JSON strict (response_format = json_object), champs : titre, source, pays/région, orientation, statut, score, décision, amount_crbn, justifications
-- Transparence : journal public des événements, sources et hypothèses; triggers de réévaluation; versionnage des prompts et des modèles
-- Neutralité : annonces futures/conditionnelles/recours = NEUTRAL (amount=0) jusqu’à implémentation vérifiée
-
-## Gouvernance (Conseil/DAO)
-- Conseil des validateurs : revue des événements, arbitrage des cas limites, publication des justifications
-- Processus : proposition → revue → vote (quorum/seuils) → exécution; appels possibles (NEUTRAL) avec réévaluation
-- Paramètres dynamiques : caps journaliers, tampon de burn, file d’attente des événements (pending) et reprise automatique
-- Transparence : métriques publiques (pending_burns/mints, trésorerie, couverture), rapports réguliers, droit de veto technique en cas d’anomalie
-
-## 3. TOKENOMICS
-### Supply et Distribution
-Supply Initial : 1,000,000,000 CBWD
-
-### Mécanisme Burn/Mint
-Échelle d'Impact :
-- Local (ville) : 1K-10K CBWD
-- Régional : 10K-100K CBWD
-- National : 100K-1M CBWD
-- International : 1M-10M CBWD
-
-Modulation contextuelle : Même action = impact différent selon pays (pop, PIB, émissions actuelles)
-
-### Revenus Fondateur
-1. Vesting Tokens (100M CBWD)
-- Année 1-4 : 25M CBWD/an débloqués
-- Valeur potentielle :
-  - Bear ($0.01) : $250K/an → $1M total
-  - Base ($0.10) : $2.5M/an → $10M total
-  - Bull ($1.00) : $25M/an → $100M total
-
-2. Frais Transaction (Optionnel)
-   - 0.05% sur swaps DEX → wallet fondateur
-   - Volume $1M/jour → ~$18K/an
-   - Volume $10M/jour → ~$180K/an
-
-3. Consulting/Partenariats
-   - Gouvernements adoptant CARBON : $50K-200K/contrat
-   - Conférences/représentation : $5K-50K/event
-   - Estimé : $100K-500K/an (an 2+)
-
-Total Projeté 4 ans (scénario base) : $10M-15M
-
-## 4. Lancement Solo - Budget Zéro
-### Phase 1 : Développement (3-6 mois)
-Compétences nécessaires :
-- Solana/Rust (TRAE code : 30 CHF/mois)
-- Prompting IA (API OpenRouter : GRATUIT)
-- Montage vidéo basique (gratuit : CapCut, DaVinci)
-
-Coûts incompressibles :
-- Domaine + site : 15 CHF/an (Infomaniak)
-- Liquidité DEX initiale : $2K-5K minimum (SOL + CBWD)
-- Total minimum : 675 CHF (sur 6 mois)
-
-### Phase 2 : Bootstrapping
-- Mois 1-6 :
-  - Vous validez manuellement les événements (IA assiste)
-  - ~50-100 événements suivis
-  - Transparence totale sur le process
-- Mois 6-12 :
-  - Semi-automatisation progressive
-  - Premiers "validateurs communauté" bénévoles
-  - ~500 événements
-- An 2+ :
-  - Automatisation complète si adoption décolle
-  - Revenus suffisants pour infrastructure robuste
-
-## 5. Roadmap Ultra-Simple
-- Q4 2025 - Q1 2026 : Dev smart contract + Agent IA MVP
-- Q2 2026 : Launch Mainnet + vidéo YouTube 1
-- Q3-Q4 2026 : Croissance organique, premiers burns/mints
-- 2027 : 1,000+ holders, partenariats ONG, semi-automatisation
-- 2028+ : Scale mondial, reconnaissance institutionnelle
-
-## 6. Risques
-- Technique : Bugs smart contract → Audits communautaires + bug bounty
-- Adoption : Personne n'utilise → Persistance 12+ mois nécessaire
-- Régulation : SEC/AMF → Utility token, pas sécurité. Geo-blocking si besoin
-- IA : Erreurs d'évaluation → Corrections publiques, réévaluations
-- Concurrence : Copieurs → First mover + authenticité = avantage
-
-## 7. Pourquoi Ça Peut Marcher
-- ✅ Timing parfait : COP30, urgence climatique max
-- ✅ Narrative puissant : "Premier token qui disparaît = victoire"
-- ✅ Viral potential : Story + YouTube = croissance organique
-- ✅ Alignement parfait : Impossible de profiter du désastre
-- ✅ Solo faisable : Pas besoin d'équipe/millions au départ
-- ✅ Authentique : Vous = Satoshi du climat, passion visible
-
-## Conclusion : Le Pari
-CARBON parie sur l'intelligence collective de l'humanité.
-
-Si nous réussissons → Supply brûle, holders gagnent, monde sauvé.
-
-Si nous échouons → Supply explose, tokens sans valeur, monde détruit.
-
-Pour la première fois, l'altruisme peut devenir un moteur économique.
+## Sécurité & Opérationnel
+- Ne jamais committer les secrets (`.env`).
+- `BURN_SOURCE` et la politique garantissent prudence opérationnelle.
+- En cas d’anomalie, droit de veto technique: bascule en `DRY_RUN` et/OU suspension auto-run.
 
 ---
-Contact : [carbon-token.] | [@CarbonCBWD] | [discord.gg/carbon]
-
-Fondateur : NEOUS AXIS
-
-Version : 1.0 - Octobre 2025
+Ce README définit les règles, la supply, les calculs et la politique par défaut pour assurer simplicité, solidité et durabilité. Toute évolution doit maintenir la cohérence: on-chain comme off-chain.
