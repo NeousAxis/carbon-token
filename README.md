@@ -73,5 +73,11 @@ CARBON est un protocole et un token Solana piloté par un agent IA. Il évalue d
 - `docs/policy.md` pour la politique et l’allowlist.
 - `docs/api.md` pour les endpoints et exemples.
 
+## Changelog
+- Refonte README avec règles IA, supply/policy, API et configuration.
+- Ajout `CONTRIBUTING.md` et docs de base (`docs/policy.md`, `docs/api.md`).
+- Mise à jour `sync/.env.example` avec `POLICY_ALLOW_SOURCES`, `BURN_SOURCE`, `AUTO_TOPUP_EXTRA_BPS`.
+- Ajout bloc `.env` d’exemple dans `docs/policy.md` (policy + auto-run).
+
 ---
 Ce README définit les règles, la supply, les calculs et la politique par défaut pour assurer simplicité, solidité et durabilité. Toute évolution doit maintenir la cohérence: on-chain comme off-chain.
