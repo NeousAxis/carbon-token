@@ -2,18 +2,15 @@
 // ⚙️ CONFIG (copier-coller prêt à l'emploi)
 // ==================================================
 const OPENROUTER_KEY = process.env.OPENROUTER_KEY;
+const HAS_AI = !!OPENROUTER_KEY;
 const SUPABASE_URL = 'https://drmlsquvwybixocjwdud.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRybWxzcXV2d3liaXhvY2p3ZHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMDU0NzUsImV4cCI6MjA3NTg4MTQ3NX0.rimLZpAQEyVy8ci1j76HbgagFdtQJefKhZFkr20mlrE';
-
-if (!OPENROUTER_KEY) {
-  throw new Error('OPENROUTER_KEY is missing. Please set it in .env');
-}
 
 // Limite de sécurité pour éviter les surcoûts d'IA (mets 999 si tu veux tout traiter)
 const MAX_ITEMS = 20;     // ← ajuste si besoin
 const SLEEP_MS  = 400;    // petite pause entre appels IA pour éviter le throttling
 
-const SYSTEM_PROMPT = `Tu es l'Agent CARBON. Analyse selon 4D.
+const SYSTEM_PROMPT = `Tu es l'Agent CARBON. Analyse l'article complet et décide.
 Réponds UNIQUEMENT : {"decision":"BURN"|"MINT"|"NEUTRAL","amount_crbn":100000,"final_score":5.5,"confidence":7,"justification":"..."}`;
 
 
@@ -28,8 +25,12 @@ function parseRSS(xmlString) {
     const itemXml = match[1];
     const titleMatch = /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s.exec(itemXml);
     const title = titleMatch ? (titleMatch[1] || titleMatch[2] || '').trim() : '';
-    const linkMatch = /<link>(.*?)<\/link>/s.exec(itemXml);
-    const link = linkMatch ? linkMatch[1].trim() : '';
+    const linkMatch = /<link><!\[CDATA\[(.*?)\]\]><\/link>|<link>(.*?)<\/link>/s.exec(itemXml);
+    let link = linkMatch ? ((linkMatch[1] || linkMatch[2] || '').trim()) : '';
+    if (!link) {
+      const guidMatch = /<guid.*?>(.*?)<\/guid>/s.exec(itemXml);
+      if (guidMatch) link = (guidMatch[1] || '').trim();
+    }
     const descMatch = /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/s.exec(itemXml);
     const description = descMatch ? (descMatch[1] || descMatch[2] || '').trim() : '';
     if (title && link) articles.push({ title, link, description });
@@ -101,44 +102,39 @@ for (const { title, link, description, source } of allArticles) {
       continue;
     }
 
-    // --- Appel IA ---
-    const aiData = await http.call(this, {
-      method: 'POST',
-      url: 'https://openrouter.ai/api/v1/chat/completions',
-      headers: {
-        Authorization: `Bearer ${OPENROUTER_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: {
-        model: 'openai/gpt-3.5-turbo',
-        temperature: 0.3,
-        max_tokens: 2000,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: `Titre: ${title}\nURL: ${link}\nSource: ${source}\nDescription: ${description}\n\nAnalyse.` }
-        ],
-      },
-      json: true,
-    });
+    // --- Analyse IA (tolérante) ---
+    let analysis = { decision: 'NEUTRAL', amount_crbn: 0, final_score: 0, confidence: 5, justification: HAS_AI ? 'AI parse failed, fallback' : 'AI disabled' };
+    if (HAS_AI) {
+      try {
+        const aiData = await http.call(this, {
+          method: 'POST',
+          url: 'https://openrouter.ai/api/v1/chat/completions',
+          headers: {
+            Authorization: `Bearer ${OPENROUTER_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: {
+            model: 'openai/gpt-3.5-turbo',
+            temperature: 0.3,
+            max_tokens: 2000,
+            messages: [
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: `Titre: ${title}\nURL: ${link}\nSource: ${source}\nDescription: ${description}\n\nAnalyse.` }
+            ],
+          },
+          json: true,
+        });
 
-    const aiText = aiData?.choices?.[0]?.message?.content ?? '';
-    const cleaned = aiText.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-
-    let analysis;
-    try {
-      analysis = JSON.parse(cleaned);
-    } catch (e) {
-      results.push({ json: { error: 'AI JSON parse failed', url: link, title, raw: aiText } });
-      // petite pause quand même avant de passer au suivant
-      await sleep(SLEEP_MS);
-      continue;
+        const aiText = aiData?.choices?.[0]?.message?.content ?? '';
+        const cleaned = aiText.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        if (parsed && parsed.decision) analysis = parsed;
+      } catch (_) {
+        // on garde l'analysis neutre par défaut
+      }
     }
 
-    if (!analysis?.decision) {
-      results.push({ json: { error: 'AI decision missing', url: link, title, raw: cleaned } });
-      await sleep(SLEEP_MS);
-      continue;
-    }
+    if (!analysis?.decision) analysis.decision = 'NEUTRAL';
 
     // --- Sauvegarde Supabase ---
     const txHash = `${analysis.decision}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;

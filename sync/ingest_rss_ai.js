@@ -24,8 +24,12 @@ function parseRSS(xmlString) {
     const itemXml = m[1];
     const t = /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s.exec(itemXml);
     const title = (t && (t[1] || t[2] || '').trim()) || '';
-    const l = /<link>(.*?)<\/link>/s.exec(itemXml);
-    const link = l ? (l[1] || '').trim() : '';
+    const l = /<link><!\[CDATA\[(.*?)\]\]><\/link>|<link>(.*?)<\/link>/s.exec(itemXml);
+    let link = l ? ((l[1] || l[2] || '').trim()) : '';
+    if (!link) {
+      const g = /<guid.*?>(.*?)<\/guid>/s.exec(itemXml);
+      if (g) link = (g[1] || '').trim();
+    }
     const d = /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/s.exec(itemXml);
     const description = d ? ((d[1] || d[2] || '').trim()) : '';
     if (title && link) out.push({ title, link, description });
@@ -68,10 +72,20 @@ function domainFromUrl(u) {
   try { return new URL(u).hostname; } catch { return ''; }
 }
 
+function normalizeSourceTag(tagRaw) {
+  const t = String(tagRaw || '').toLowerCase().trim();
+  if (!t) return '';
+  if (['human_rights','humanrights','rights','droits','droits_humains'].includes(t)) return 'human_rights';
+  if (['sdg','odd','objectifs','sustainable_development_goals'].includes(t)) return 'sdg';
+  if (['un','onu','united_nations','onu_agency','agence_onu'].includes(t)) return 'un';
+  if (['other','news','media'].includes(t)) return 'other';
+  return '';
+}
+
 async function aiAnalyze({ title, url, source, description, content }) {
   if (!OPENROUTER_KEY) throw new Error('missing OPENROUTER_KEY');
   const systemPrompt = [
-    'Tu es CARBON Agent. Analyse un ARTICLE COMPLET (pas seulement le titre) selon le cadre 4D: orientation, statut, temporalité, ampleur.',
+    'Tu es CARBON Agent. Analyse un ARTICLE COMPLET (pas seulement le titre) en évaluant orientation, statut, temporalité et ampleur.',
     'Décision stricte JSON: {"decision":"BURN"|"MINT"|"NEUTRAL","amount_crbn":100000,"final_score":5.5,"confidence":7,"justification":"..."}. Ajoute si possible: {"event_status":"implemented"|"planned"|"appeal"|"hazard","orientation":"positive"|"negative"|"neutral","modality":"indicative"|"conditional","tense":"past"|"present"|"future","scope":"local"|"regional"|"national"|"international"}.',
     'Règles: Impact positif concret mis en œuvre → BURN; Régression avérée → MINT; Appels/opportunités ou aléas sans mesure → NEUTRAL. Le CONTENU prime sur le titre.',
     'NEUTRAL = montant 0. Ajuster le montant et le score selon gravité/portée.'
@@ -127,29 +141,47 @@ function normalizeDecision(analysis, { title, description, content }) {
   const appealTokens = ['appel','appelle','appellent','sollicite','sollicitent','demande','demandent','exhorte','exhortent'];
   const hazardTokens = ['mousson','inondation','inondations','séisme','tremblement','cyclone','ouragan'];
   const actionTokens = ['adopte','adopté','adoptée','accorde','accordé','décide','décidé','met en oeuvre','mise en oeuvre','applique','appliqué','entre en vigueur','rétabli','rétablit','lance','lancé','promulgue','promulgué'];
-  const negativeOrientationTokens = ['s\'aggrave','aggrave','gagne du terrain','au bord de la rupture','effondrement','régression','recule','privation','interdiction','droits effacés','pénurie','pénuries'];
+  const negativeOrientationTokens = ["s'aggrave",'aggrave','gagne du terrain','au bord de la rupture','effondrement','régression','recule','privation','interdiction','droits effacés','pénurie','pénuries'];
   const positiveOrientationTokens = ['améliore','progrès','réouverture','libération','accès rétabli','protège','renforcé','renforcement','mise en place','mise en application'];
+  const climateTokens = ['climat','écologie','environnement','émission','émissions','gaz à effet de serre','co2','carbone','neutralité','biodiversité','reforestation','renouvelable','énergie','solaire','éolien','déforestation','protection','droits humains','droits de l\'homme','onu','nations unies','accord de paris'];
 
   const isConditional = conditionalTokens.some(k => text.includes(k)) || modality === 'conditional';
-  const isFuture = futureTokens.some(k => text.includes(k)) || tense === 'future' || tense === 'future';
+  const isFuture = futureTokens.some(k => text.includes(k)) || tense === 'future';
   const hasAppeal = appealTokens.some(k => text.includes(k)) || status === 'appeal';
   const hasHazard = hazardTokens.some(k => text.includes(k)) || status === 'hazard';
   const hasAction = actionTokens.some(k => text.includes(k)) || status === 'implemented';
   const isPlanned = (!hasAction) && (isConditional || isFuture || status === 'planned');
   const hasNegative = negativeOrientationTokens.some(k => text.includes(k)) || orientation === 'negative';
   const hasPositive = positiveOrientationTokens.some(k => text.includes(k)) || orientation === 'positive';
+  const hasClimateContext = climateTokens.some(k => text.includes(k));
 
-  if (hasHazard || hasAppeal) return 'NEUTRAL';
-  if (isPlanned && !hasAction) return 'NEUTRAL';
-  if (hasAction && hasPositive && !hasNegative) return 'BURN';
-  if (hasNegative && (hasAction || (!isPlanned && !hasAppeal && !hasHazard))) return 'MINT';
-
-  if (Number.isFinite(score)) {
-    if (score > 0.5) return 'BURN';
-    if (score < -0.5) return 'MINT';
+  // Première passe: heuristiques
+  let candidate = 'NEUTRAL';
+  if (!(hasHazard || hasAppeal)) {
+    if (isPlanned && !hasAction) {
+      candidate = 'NEUTRAL';
+    } else if (hasAction && hasPositive && !hasNegative) {
+      candidate = 'BURN';
+    } else if (hasNegative && (hasAction || (!isPlanned && !hasAppeal && !hasHazard))) {
+      candidate = 'MINT';
+    } else if (Number.isFinite(score)) {
+      if (score > 0.5) candidate = 'BURN';
+      else if (score < -0.5) candidate = 'MINT';
+      else candidate = 'NEUTRAL';
+    } else if (dRaw === 'BURN' || dRaw === 'MINT' || dRaw === 'NEUTRAL') {
+      candidate = dRaw;
+    }
   }
-  if (dRaw === 'BURN' || dRaw === 'MINT' || dRaw === 'NEUTRAL') return dRaw;
-  return 'NEUTRAL';
+
+  // Garde stricte Livre Blanc: pas de BURN sans action claire et contexte climat/SDG/ONU
+  const srcTag = String(analysis?.event_source_tag || '').toLowerCase();
+  const sourceAllowed = ['sdg','un','human_rights','nature_rights'].includes(srcTag);
+  if (candidate === 'BURN') {
+    if (!hasAction || !hasPositive) candidate = 'NEUTRAL';
+    if (!(sourceAllowed || hasClimateContext)) candidate = 'NEUTRAL';
+  }
+
+  return candidate;
 }
 
 function sanitizeAmount(decision, amount_crbn) {
@@ -182,6 +214,18 @@ async function supabaseInsertEvent(ev) {
   return body;
 }
 
+// Heuristic: detect institution/source tags directly from text when AI misses them
+function heuristicSourceTagFromText(title, description, content) {
+  const text = `${title} ${description} ${content}`.toLowerCase();
+  const unTokens = ['onu','nations unies','united nations','ohchr','hrc','conseil des droits de l\'homme','rapport de l\'onu','haut commissariat'];
+  const hrTokens = ['amnesty','human rights watch','hrw','droits humains',"droits de l\'homme","organisation de défense des droits"];
+  const sdgTokens = ['odd','sdg','objectifs de développement durable','sustainable development goals'];
+  if (unTokens.some(k => text.includes(k))) return 'un';
+  if (hrTokens.some(k => text.includes(k))) return 'human_rights';
+  if (sdgTokens.some(k => text.includes(k))) return 'sdg';
+  return '';
+}
+
 async function processArticle({ title, link, description }) {
   const source = domainFromUrl(link) || 'Source';
   if (await supabaseExistsByUrl(link)) {
@@ -195,12 +239,20 @@ async function processArticle({ title, link, description }) {
   const decision = normalizeDecision(analysis, { title, description, content });
   const amountSan = sanitizeAmount(decision, analysis.amount_crbn);
 
+  const tagHeuristic = heuristicSourceTagFromText(title, description, content);
+  const tag = normalizeSourceTag(analysis?.event_source_tag) || tagHeuristic;
+  const event_source_final = (tag && tag !== 'other') ? tag : source;
+
+  // Garde additionnelle: ne jamais insérer BURN/MINT avec montant zéro → NEUTRAL
+  const decisionFinal = (Number(amountSan) <= 0) ? 'NEUTRAL' : decision;
+  const amountFinal = decisionFinal === 'NEUTRAL' ? 0 : amountSan;
+
   const eventData = {
     event_title: title,
     event_url: link,
-    event_source: source,
-    decision,
-    amount_crbn: amountSan,
+    event_source: event_source_final,
+    decision: decisionFinal,
+    amount_crbn: amountFinal,
     final_score: Number(analysis.final_score) || 0,
     confidence: parseInt(analysis.confidence) || 5,
     justification: String(analysis.justification || ''),
@@ -208,7 +260,7 @@ async function processArticle({ title, link, description }) {
     created_at: new Date().toISOString()
   };
   const saved = await supabaseInsertEvent(eventData);
-  console.log('✓ Saved', { id: saved?.[0]?.id, decision, amount_crbn: amountSan });
+  console.log('✓ Saved', { id: saved?.[0]?.id, decision: decisionFinal, amount_crbn: amountFinal, event_source: event_source_final });
   await sleep(SLEEP_MS);
   return saved?.[0] || null;
 }
@@ -244,7 +296,8 @@ async function ingestSingleArticle(articleUrl) {
     process.exit(2);
   }
   try {
-    if (/\.xml($|\?)/.test(arg)) {
+    const isRss = /(\.xml|\/rss)(\?|$)/.test(arg) || /(?:\?|&)format=mrss\b/.test(arg);
+    if (isRss) {
       const results = await ingestFromRSS(arg, lim);
       console.log('Done RSS. Inserted:', results.length);
     } else {

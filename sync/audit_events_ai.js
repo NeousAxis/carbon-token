@@ -19,7 +19,7 @@ function stripTags(html) {
   const blockMatch = /<(article|main|section|div)([^>]*?(article|content|story|post|text)[^>]*)>([\s\S]*?)<\/\1>/i.exec(h);
   const target = blockMatch ? blockMatch[4] : h;
   const text = target
-    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<br\s*\/?>(?=\s*[^\n])/gi, '\n')
     .replace(/<p[^>]*>/gi, '\n')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
@@ -38,7 +38,7 @@ function truncate(str, max) { return (!str || str.length <= max) ? (str||'') : (
 async function aiAnalyze({ title, url, source, content }) {
   if (!OPENROUTER_KEY) throw new Error('missing OPENROUTER_KEY');
   const systemPrompt = [
-    'Tu es CARBON Agent. Analyse l\'ARTICLE COMPLET (pas seulement le titre) selon le cadre 4D: orientation (positive/négative), statut (implémenté/planifié/appel/aléa), temporalité (passé/présent/futur, indicatif/conditionnel), ampleur (locale/régionale/nationale/internationale).',
+    'Tu es CARBON Agent. Analyse l\'ARTICLE COMPLET (pas seulement le titre) en évaluant orientation (positive/négative), statut (implémenté/planifié/appel/aléa), temporalité (passé/présent/futur, indicatif/conditionnel), ampleur (locale/régionale/nationale/internationale).',
     'Réponds uniquement en JSON strict. Inclure au minimum: {"decision":"BURN"|"MINT"|"NEUTRAL","amount_crbn":int,"final_score":float,"confidence":int,"justification":"..."}. Si possible ajoute: {"event_status":"implemented"|"planned"|"appeal"|"hazard","orientation":"positive"|"negative"|"neutral","modality":"indicative"|"conditional","tense":"past"|"present"|"future","scope":"local"|"regional"|"national"|"international"}.',
     'Règles: BURN = progrès concrets mis en œuvre (droits/justice/protection/climat); MINT = régression avérée (violences/pénuries/effondrement/atteintes systémiques); NEUTRAL = appel/opportunité ou aléa naturel SANS mesure nouvelle. Le CONTENU prime sur le titre.',
     'Montant nul si NEUTRAL. Ajuster l\'échelle du montant et le score selon la gravité et la portée.'
@@ -65,7 +65,7 @@ function normalizeDecision(analysis, { title, content }) {
   const score = Number(analysis?.final_score);
   const text = `${title} ${content}`.toLowerCase();
 
-  // Orientation & statut fournis par l\'IA (si présents)
+  // Orientation & statut fournis par l'IA (si présents)
   const orientation = (analysis?.orientation || '').toLowerCase();
   const status = (analysis?.event_status || '').toLowerCase();
   const modality = (analysis?.modality || '').toLowerCase();
@@ -79,30 +79,49 @@ function normalizeDecision(analysis, { title, content }) {
   const actionTokens = ['adopte','adopté','adoptée','accorde','accordé','décide','décidé','met en oeuvre','mise en oeuvre','applique','appliqué','entre en vigueur','rétabli','rétablit','lance','lancé','promulgue','promulgué'];
   const negativeOrientationTokens = ['s\'aggrave','aggrave','gagne du terrain','au bord de la rupture','effondrement','régression','recule','privation','interdiction','droits effacés','pénurie','pénuries'];
   const positiveOrientationTokens = ['améliore','progrès','réouverture','libération','accès rétabli','protège','renforcé','renforcement','mise en place','mise en application'];
+  const climateTokens = ['climat','écologie','environnement','émission','émissions','gaz à effet de serre','co2','carbone','neutralité','biodiversité','reforestation','renouvelable','énergie','solaire','éolien','déforestation','protection','droits humains','droits de l\'homme','onu','nations unies'];
 
   const isConditional = conditionalTokens.some(k => text.includes(k)) || modality === 'conditional';
-  const isFuture = futureTokens.some(k => text.includes(k)) || tense === 'future' || tense === 'future';
+  const isFuture = futureTokens.some(k => text.includes(k)) || tense === 'future';
   const hasAppeal = appealTokens.some(k => text.includes(k)) || status === 'appeal';
   const hasHazard = hazardTokens.some(k => text.includes(k)) || status === 'hazard';
   const hasAction = actionTokens.some(k => text.includes(k)) || status === 'implemented';
   const isPlanned = (!hasAction) && (isConditional || isFuture || status === 'planned');
   const hasNegative = negativeOrientationTokens.some(k => text.includes(k)) || orientation === 'negative';
   const hasPositive = positiveOrientationTokens.some(k => text.includes(k)) || orientation === 'positive';
+  const hasClimateContext = climateTokens.some(k => text.includes(k));
 
-  // Priorité par orientation/statut
-  if (hasHazard || hasAppeal) return 'NEUTRAL';
-  if (isPlanned && !hasAction) return 'NEUTRAL';
-  if (hasAction && hasPositive && !hasNegative) return 'BURN';
-  if (hasNegative && (hasAction || (!isPlanned && !hasAppeal && !hasHazard))) return 'MINT';
-
-  // Repli sur le score du modèle
-  if (Number.isFinite(score)) {
-    if (score > 0.5) return 'BURN';
-    if (score < -0.5) return 'MINT';
+  // Première passe: heuristiques
+  let candidate = 'NEUTRAL';
+  if (!(hasHazard || hasAppeal)) {
+    if (isPlanned && !hasAction) {
+      candidate = 'NEUTRAL';
+    } else if (hasAction && hasPositive && !hasNegative) {
+      candidate = 'BURN';
+    } else if (hasNegative && (hasAction || (!isPlanned && !hasAppeal && !hasHazard))) {
+      candidate = 'MINT';
+    } else if (Number.isFinite(score)) {
+      if (score > 0.5) candidate = 'BURN';
+      else if (score < -0.5) candidate = 'MINT';
+      else candidate = 'NEUTRAL';
+    } else if (dRaw === 'BURN' || dRaw === 'MINT' || dRaw === 'NEUTRAL') {
+      candidate = dRaw;
+    }
   }
-  // Respecter la décision brute si valide
-  if (dRaw === 'BURN' || dRaw === 'MINT' || dRaw === 'NEUTRAL') return dRaw;
-  return 'NEUTRAL';
+
+  // Contexte institutionnel: l'ONU détectée dans le texte → source autorisée
+  const unTokens = ['onu','nations unies','united nations','ohchr','hrc','conseil des droits de l\'homme'];
+  const hasUnContext = unTokens.some(k => text.includes(k));
+
+  // Garde stricte Livre Blanc: pas de BURN sans action claire et contexte climat/SDG/ONU
+  const srcTag = String(analysis?.event_source_tag || '').toLowerCase();
+  const sourceAllowed = ['sdg','un','human_rights','nature_rights'].includes(srcTag) || hasUnContext;
+  if (candidate === 'BURN') {
+    if (!hasAction || !hasPositive) candidate = 'NEUTRAL';
+    if (!(sourceAllowed || hasClimateContext)) candidate = 'NEUTRAL';
+  }
+
+  return candidate;
 }
 
 function sanitizeAmount(decision, amount_crbn) {
