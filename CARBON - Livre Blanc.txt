@@ -1,154 +1,88 @@
-🌍 LIVRE BLANC — CBWD (Carbon World Data)
-Protocole autonome d’évaluation des choix mondiaux au travers d’un token utile
-Version Mainnet — Octobre 2025 Auteur : Neous Axis
+🌍 LIVRE BLANC — CARBON (CBWD)
+Le Token qui Mesure la Réalité du Monde
 
-Identité & Paramètres Réseau
-Nom : Carbon World Data
-Symbole : CBWD
-Réseau : Solana Mainnet-Beta
-Décimales : 6 (1 CBWD = 10⁶ unités de base)
-Publication des adresses : les adresses Mainnet (mint, trésorerie, distribution) seront publiées au TGE sur carbon-token.xyz et sur l’explorateur Solana. Ne pas se fier aux adresses de prototypage.
-Principe : supply variable (mint/burn) en fonction des décisions publiques évaluées par l’Oracle IA 4D.
-Carbon World Data (CBWD) est un token Solana Mainnet-Beta dont la supply varie selon un oracle IA 4D. Le système ne permet pas de s’enrichir contre le monde : actions cohérentes → tokens brûlés (supply ↓, valeur ↑) ; actions incohérentes → tokens créés (supply ↑, valeur ↓).
+1. Vision
+CARBON (CBWD) est un token Solana dont la valeur reflète la cohérence entre les actions humaines, politiques, économiques et environnementales, selon un principe inédit :
+Impossible de s’enrichir contre la planète.
+Chaque événement mondial est évalué par un système d’intelligence artificielle et traduit en variation de supply :
+✅ Action positive → Tokens brûlés → Supply ↓ → Valeur ↑
+❌ Action négative → Tokens créés → Supply ↑ → Valeur ↓
+Le paradoxe économique : si l’humanité échoue, la supply explose et la valeur s’effondre.
+CARBON relie ainsi économie, éthique et écologie dans un même mouvement mesurable.
 
-1. Concept
-CBWD (Carbon World Data) est un Protocole autonome d’évaluation des choix mondiaux au travers d’un token utile. Il agrège des informations politiques, économiques, sociales et environnementales, puis les analyse via une IA 4D. Chaque événement reconnu et validé entraîne automatiquement une variation de supply sur Solana, traduisant l’état de cohérence du monde en données dynamiques.
-Les référentiels utilisés sont :
-les Objectifs de Développement Durable (ODD),
-la Charte universelle des Droits de l’Homme (ONU 1948),
-la Charte universelle des Droits de la Nature (ONU 2010).
-2.x Règle de décision et d’amplitude (Mint/Burn)
-(alignée sur l’implémentation Mainnet actuelle)
-Chaque événement est évalué en snapshot selon son statut, son orientation, et son alignement instantané avec les ODD (ONU), la Charte des Droits de l’Homme et la Charte des Droits de la Nature. Aucune mémoire ni projection : seule la situation présente compte.
-
-1. Décision
-Statuts non implémentés (planned, future, conditional, appeal, alert) → NEUTRAL (aucune action).
-Statuts implémentés / en vigueur (implemented, done, in-force, operational) :
-Orientation positive → BURN
-Orientation négative → MINT
-Orientation neutre → on conserve une décision valide si déjà présente, sinon NEUTRAL
-Règle simple : un événement aligné avec les ODD et les Chartes brûle des tokens ; un événement contraire en crée.
-
-2. Quantification
-L’amplitude de la variation dépend de trois paramètres actifs et d’un champ enregistré mais non appliqué :
-
-La conversion finale s’effectue en unités de base (× 10⁶). Le signe (BURN / MINT) dépend uniquement de l’orientation ; l’amplitude reste indépendante du sens.
-
-3. Portée ODD
-L’oracle publie pour chaque événement la liste des ODD concernés (sdgs) et, lorsque disponible, un ODD principal (sdg_primary). Les classifications « 5 P » (People, Planet, Prosperity, Peace, Partnerships) et les pondérations par ODD sont prévues pour des versions futures et ne sont pas encore exploitées dans le calcul.
-
-Exemple 1 — Interdiction nationale des sacs plastiques à usage unique
-Statut : implemented
-Orientation : positive
-ODD concernés : 12 (Consommation et production responsables), 14 (Vie aquatique), 15 (Vie terrestre)
-Échelle : national
-Score : 7/10
-Contexte : 1.0
-Analyse : L’événement favorise directement la réduction de la pollution plastique et la protection des écosystèmes. Amplitude ≈ 100 k + 0.7 × (900 k) = 730 000 CBWD → BURN de 730 000 CBWD → réduction visible de la supply sur l’explorateur.
-
-Exemple 2 — Suspension d’un traité international sur la protection de l’Arctique
-Statut : in-force (abrogation effective)
-Orientation : négative
-ODD concernés : 13 (Action climatique), 14 (Vie aquatique), 17 (Partenariats pour les objectifs)
-Échelle : international
-Score : 8/10
-Contexte : 1.2 (zone d’impact mondiale)
-Analyse : La suppression d’un mécanisme de coopération environnementale entraîne une dégradation directe de la cohérence mondiale. Amplitude ≈ 1 M + 0.8 × (9 M) = 8.2 M × 1.2 = 9 840 000 CBWD → MINT de 9,84 M CBWD → augmentation mesurable de la supply (signal de dissonance planétaire).
-
-Exemple 3 — Réforme nationale augmentant les quotas d’émission industrielle
-Statut : implemented
-Orientation : négative
-ODD concernés : 7 (Énergie propre et d’un coût abordable), 13 (Action climatique)
-Échelle : national
-Score : 5/10
-Contexte : 1.1
-Analyse : L’augmentation autorisée des émissions de CO₂ va à l’encontre des objectifs climatiques. Amplitude ≈ 100 k + 0.5 × (900 k) = 550 k × 1.1 = 605 000 CBWD → MINT de 605 000 CBWD → légère expansion de la supply reflétant une perte de cohérence nationale.
-
-Synthèse
-
-
-5. Évolutivité (prévu)
-Facteur de confiance : son intégration dans le calcul est planifiée pour pondérer la volatilité des décisions.
-Scope ODD 5P : ajout futur d’une classification thématique et de pondérations par ODD.
-Ces extensions n’affecteront pas la règle de décision (orientation → BURN / MINT), uniquement la finesse du calcul d’amplitude.
-
-3. Référentiels universels
-CBWD repose sur trois fondements reconnus internationalement :
-Charte universelle des Droits de l’Homme (ONU, 1948)
-Charte universelle des Droits de la Nature (ONU, 2010)
-Objectifs de Développement Durable (ODD)
-Ces textes constituent la grille d’interprétation neutre des actions humaines : la cohérence est définie par le respect simultané de la dignité humaine, de l’équilibre écologique et du progrès collectif.
-
-4. TOKENOMICS (Mainnet)
-4.1 Supply et répartition
-Supply initiale (Mainnet) : 1 000 000 CBWD (6 décimales)
-Répartition de genèse :
-≈ 2/3 pour la distribution, utilité et circulation contrôlée
-≈ 1/3 pour la trésorerie (tampon de burn)
-Toutes les métriques sont exprimées en unités brutes (base units). Les affichages publics divisent par 10⁶ pour afficher en CBWD.
-“Supply initiale Mainnet : 1 000 000 CBWD (6 décimales). À la genèse, environ deux tiers sont affectés à la distribution/utilité et un tiers à la réserve de burn. Les opérations mint/burn sont exécutées en unités brutes et publiées sur l’explorateur.”
-
-4.2 Mécanisme Mint/Burn
-Les événements validés par l’oracle 4D déclenchent un MINT ou BURN.
-Pondération par ODD / Chartes / contexte (local → global).
-Cap journalier paramétrable par gouvernance (plancher/plafond par 24 h).
-Lissage automatique (smoothing) pour éviter les spikes.
-File d’attente déterministe pour traitement ordonné.
-Tous les paramètres (cap, cadence, marges) sont publiés et audités.
-
-4.3 Mint-Split (1,5 %) — Soutenabilité humaine
-À chaque MINT, 1,5 % des unités sont réparties ainsi :
-
-Payroll : budget mensuel plafonné, décaissement CBWD→USDC publié (hash tx). Priorité : maintenance > sécurité > direction > R&D.
-Ce mécanisme assure la pérennité humaine du protocole sans altérer la logique autonome.
-
-4.4 Protocol-Owned Liquidity (POL)
-Paires CBWD/USDC déployées sur Raydium ou Orca.
-Frais de swap réinvestis dans Ops et Burn-Buffer.
-Politique prudente : pas de taxe utilisateur, exposition graduelle.
-
-4.5 Transparence et métriques publiques
-
-
-5. Utilité du protocole
-CBWD fournit une lecture mesurable du réel utilisable par tous :
-
-
-6. Automatisation & Gouvernance
-Gouvernance
-Multi-sig sur les rôles critiques : mint authority, trésorerie.
-Conseil des validateurs : revue des événements, arbitrage, publication des justifications.
-Paramètres dynamiques : cap journalier, cadence, tampons, priorités de file d’attente.
-Automatisation
-Traitement périodique des événements en attente avec lissage automatique.
-Veto technique (arrêt d’urgence) en cas d’anomalies détectées.
-Conformité
-Publication continue des politiques (caps, bps, marges).
-Journalisation intégrale et audits réguliers.
-“Les opérations mint/burn en production requièrent multi-sig. La file d’attente est traitée automatiquement avec cap journalier et lissage ; un droit de veto technique est prévu en cas d’anomalies.”
-
-7. Gouvernance & Sécurité
-Aucune intervention humaine dans les décisions de l’oracle.
-Multi-sig pour Ops et Payroll.
-Logs IA 4D signés et horodatés on-chain.
-Audits indépendants, bug bounty ouvert.
-Dashboard et API publics (lecture seule).
-
-8. Rôle du fondateur
-Neous Axis : auteur du protocole et gardien de son intégrité. Aucun token réservé. Rémunération assurée via Payroll on-chain (Mint-Split) et activités externes : consulting, licences IA 4D, conférences, partenariats.
-9. Adresses & Publication
-Publication au TGE :
-mint (adresse du token CBWD) et treasury_ata (réserve burn) publiées à la genèse Mainnet.
-Adresses de distribution/utilité communiquées selon la stratégie (transparence vs confidentialité opérationnelle).
-Avertissement :
-Ne pas envoyer de fonds aux adresses de prototypage.
-Seules les adresses publiées sur carbon-token.xyz et l’explorateur Solana sont valides.
-
-10. Feuille de route 2025-2028
+2. L’Agent IA — Le Cadre de Cohérence
+L’agent IA CARBON évalue chaque événement selon quatre dimensions interdépendantes :
 
 
 
-11. Conclusion
-Carbon World Data (CBWD) inscrit l’état du monde dans une infrastructure autonome et transparente. Chaque événement, décision ou progrès collectif se traduit par une trace mesurable sur la blockchain : les choix humains deviennent des données.
-CBWD ne représente pas une idéologie, mais une structure de cohérence vivante : quand le monde agit en équilibre, la supply se contracte ; lorsqu’il dérive, elle s’étend.
-Une écriture continue du réel, auditable par tous.
+L’IA ne juge pas : elle observe, pondère et traduit les dynamiques collectives en signaux quantifiables.
+
+3. Triangle de Modération et Cadre Éthique
+Le cœur du système repose sur un triangle de modération qui produit la note de cohérence globale (NCG) en croisant trois piliers :
+- Les pondérations globales — garantissent la stabilité structurelle du modèle.
+- Les Objectifs de Développement Durable (ODD / SDGs) — assurent une orientation universelle vers le bien commun.
+- Les dynamiques humaines fondamentales — traduisent la diversité des formes d’action et de transformation du monde.
+
+Ce triangle permet à CARBON d’intégrer un maximum de variables hétérogènes — économiques, écologiques, politiques et culturelles — pour évaluer la cohérence réelle du système terrestre.
+
+3.1. Les dynamiques humaines fondamentales
+
+3.2. Les référentiels d’évaluation internationaux
+
+3.3. Pondérations globales
+
+3.4. Calcul de la Note de Cohérence Globale (NCG)
+NCG = Σ (Pondérations globales × Alignement SDG × Dynamique humaine)
+Chaque variation (mint / burn) découle d’une oscillation mesurée à l’intérieur de ce triangle.
+L’IA équilibre les temporalités (immédiat / structurel / culturel) et maintient une lecture neutre du monde.
+
+4. Tokenomics
+Supply initiale : 1 000 000 000 CBWD
+
+4.1. Mécanisme Burn / Mint
+Même action ≠ même impact : modulation selon population, PIB, émissions et contexte géopolitique.
+
+Formule :
+Amount = Base × |Score| × Multiplicateur_contexte × (Confiance / 10)
+
+Le supply résiduel ne tombera jamais à zéro : l’activité humaine conserve un impact incompressible (~20 % du supply initial), représentant l’empreinte d’une civilisation équilibrée.
+
+5. Architecture et Sources Scientifiques
+Stack technique actuel :
+- Blockchain : Solana (vitesse et faible empreinte carbone)
+- Agent IA : n8n + OpenRouter (Claude / GPT-4)
+- Base de données : Supabase (PostgreSQL)
+- Frontend : Next.js + Cloudflare Pages
+- DEX : Jupiter / Raydium
+
+Sources officielles :
+UN News, World Bank API, AP News, Reuters Connect, Euronews, IPCC, WHO, UNFCCC.
+
+
+
+Chaque décision est publiée avec :
+- un score de confiance (1–10),
+- une justification documentée,
+- une clause de faillibilité : CARBON peut se tromper, car il reflète nos erreurs collectives.
+
+6. Transparence et Gouvernance du Cadre
+CARBON ne possède aucune gouvernance humaine directe : seule la calibration du cadre de cohérence (métriques, pondérations, sources) peut être ajustée par le fondateur, selon une charte transparente et stable.
+
+Tous les ajustements sont :
+- Horodatés et inscrits on-chain,
+- Accessibles publiquement,
+- Réévalués tous les 24 mois sur base de données scientifiques.
+
+7. Philosophie et Portée
+Conscience collective × Responsabilité systémique = Valeur réelle
+CARBON n’est ni un jugement ni une spéculation : c’est un sismographe de cohérence mondiale, un instrument d’équilibre entre la matière et la conscience humaine.
+
+Chaque token devient :
+- une unité d’équilibre,
+- un thermomètre du vivant,
+- une traduction visible et économique de notre interdépendance.
+
+Si l’humanité agit avec cohérence, le token se raréfie.
+Si elle dérive, il se dilue.
+
+Dans ce projet : l’idée du Bien, du Beau et du Vrai sont le moteur économique.
